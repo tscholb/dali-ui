@@ -381,6 +381,11 @@ int32_t View::IndexOfChild(View view) const
   return Integration::GetImpl(*this).IndexOfChild(view);
 }
 
+void View::AppendAccessibilityAttribute(const Dali::String& key, const Dali::String& value)
+{
+  Integration::GetImpl(*this).GetViewDataImpl().AppendAccessibilityAttribute(key, value);
+}
+
 // From control.cpp
 
 void View::ClearBackground()

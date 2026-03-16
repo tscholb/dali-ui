@@ -1063,6 +1063,18 @@ public:
    */
   void ClearRenderEffect();
 
+  // Accessibility
+
+  /**
+   * @brief Appends an accessibility attribute key-value pair to this view.
+   *
+   * If the key already exists, the value is updated.
+   *
+   * @param[in] key The attribute key
+   * @param[in] value The attribute value
+   */
+  void AppendAccessibilityAttribute(const Dali::String& key, const Dali::String& value);
+
   // Resources
 
   /**
