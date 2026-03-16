@@ -41,10 +41,16 @@
 #include <dali-ui-foundation/devel-api/focus-manager/focus-finder.h>
 #include <dali-ui-foundation/integration-api/ui-config-manager.h>
 #include <dali-ui-foundation/integration-api/view-impl.h>
+<<<<<<< HEAD
 #include <dali-ui-foundation/public-api/view.h>
+  =======
+#include <dali-ui-foundation/public-api/controls/control-impl.h>
+#include <dali-ui-foundation/public-api/controls/control.h>
+#include <dali-ui-foundation/public-api/image-view/image-view.h>
+  >>>>>>> 3d6b1d6 (Add ImageView)
 #include <dali/devel-api/adaptor-framework/accessibility.h>
 
-using Dali::Integration::ToDaliString;
+  using Dali::Integration::ToDaliString;
 using Dali::Integration::ToStdString;
 
 namespace Dali
