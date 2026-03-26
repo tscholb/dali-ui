@@ -67,7 +67,7 @@ AnimatedImageViewImpl::~AnimatedImageViewImpl()
 {
 }
 
-Dali::String AnimatedImageViewImpl::GetUrl() const
+Dali::String AnimatedImageViewImpl::GetResourceUrl() const
 {
   return mUrl;
 }
@@ -90,7 +90,7 @@ void AnimatedImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property
         Dali::String url;
         if(value.Get(url))
         {
-          impl.SetImage(url);
+          impl.SetResourceUrl(url);
         }
         break;
       }
@@ -108,7 +108,7 @@ Dali::Property::Value AnimatedImageViewImpl::GetProperty(Dali::BaseObject* objec
     switch(index)
     {
       case AnimatedImageViewImpl::Property::IMAGE:
-        value = impl.GetUrl();
+        value = impl.GetResourceUrl();
         break;
     }
   }
@@ -126,7 +126,7 @@ MeasuredSize AnimatedImageViewImpl::OnMeasure(float widthConstraint, float heigh
   return ViewImpl::OnMeasure(widthConstraint, heightConstraint);
 }
 
-void AnimatedImageViewImpl::SetImage(const Dali::String& url)
+void AnimatedImageViewImpl::SetResourceUrl(const Dali::String& url)
 {
   if(mUrl != url)
   {

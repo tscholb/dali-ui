@@ -17,6 +17,7 @@
  *
  */
 
+#include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/uint-16-pair.h>
 
@@ -74,6 +75,11 @@ enum Type
   MIRRORED_REPEAT ///< Repeats the texture with mirroring
 };
 } // namespace WrapMode
+
+/**
+ * @brief SamplingMode is an alias for Dali::SamplingMode, configuring the filter applied when scaling the image.
+ */
+namespace SamplingMode = Dali::SamplingMode;
 
 /**
  * @brief ReleasePolicy controls when the image texture is released from the cache.

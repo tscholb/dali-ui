@@ -56,7 +56,7 @@ int UtcDaliAnimatedImageViewNewWithUrlP(void)
   TestApplication application;
   AnimatedImageView view = AnimatedImageView::New("test.gif");
   DALI_TEST_CHECK(view);
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("test.gif"), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("test.gif"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -121,14 +121,14 @@ int UtcDaliAnimatedImageViewDownCastN(void)
   END_TEST;
 }
 
-// SetImage / GetUrl
+// SetResourceUrl / GetResourceUrl
 
 int UtcDaliAnimatedImageViewSetGetImageP(void)
 {
   TestApplication application;
   AnimatedImageView view = AnimatedImageView::New();
-  view.SetImage("animation.gif");
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("animation.gif"), TEST_LOCATION);
+  view.SetResourceUrl("animation.gif");
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("animation.gif"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -136,8 +136,8 @@ int UtcDaliAnimatedImageViewSetImageNoChangeP(void)
 {
   TestApplication application;
   AnimatedImageView view = AnimatedImageView::New("animation.gif");
-  view.SetImage("animation.gif"); // same url — no update
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("animation.gif"), TEST_LOCATION);
+  view.SetResourceUrl("animation.gif"); // same url — no update
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("animation.gif"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -266,11 +266,11 @@ int UtcDaliAnimatedImageViewChainingP(void)
 {
   TestApplication application;
   AnimatedImageView view = AnimatedImageView::New()
-                             .SetImage("animation.gif")
+                             .SetResourceUrl("animation.gif")
                              .SetLoopCount(2)
                              .SetImageColor(UiColor(1.0f, 1.0f, 1.0f, 0.5f));
   DALI_TEST_CHECK(view);
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("animation.gif"), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("animation.gif"), TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetLoopCount(), 2, TEST_LOCATION);
   END_TEST;
 }

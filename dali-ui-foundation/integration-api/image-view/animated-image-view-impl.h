@@ -89,14 +89,14 @@ public: // Properties (required by DALI_PROPERTY_REGISTRATION)
 
 public: // API
   /**
-   * @copydoc Dali::Ui::AnimatedImageView::SetImage
+   * @copydoc Dali::Ui::AnimatedImageView::SetResourceUrl
    */
-  void SetImage(const Dali::String& url);
+  void SetResourceUrl(const Dali::String& url);
 
   /**
-   * @copydoc Dali::Ui::AnimatedImageView::GetUrl
+   * @copydoc Dali::Ui::AnimatedImageView::GetResourceUrl
    */
-  Dali::String GetUrl() const;
+  Dali::String GetResourceUrl() const;
 
   /**
    * @copydoc Dali::Ui::AnimatedImageView::Play

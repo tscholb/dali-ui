@@ -100,7 +100,7 @@ Dali::Actor CreateHighlightIndicatorActor()
 
 std::string FetchImageSrc(const Ui::ImageView& imageView)
 {
-  return ToStdString(imageView.GetUrl());
+  return ToStdString(imageView.GetResourceUrl());
 }
 
 bool IsAtspiRole(int32_t rawRole)

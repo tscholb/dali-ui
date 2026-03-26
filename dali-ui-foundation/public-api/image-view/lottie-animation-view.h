@@ -114,11 +114,11 @@ public: // Static Methods
 
 public: // Image
   /**
-   * @brief Sets the Lottie animation file URL.
+   * @brief Sets the resource URL of the Lottie animation file.
    *
    * @param[in] url The URL of the Lottie JSON file
    */
-  void SetImage(const Dali::String& url);
+  void SetResourceUrl(const Dali::String& url);
 
 public: // Playback Control
   /**

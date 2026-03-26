@@ -119,19 +119,19 @@ public: // Static Methods
 
 public: // Image
   /**
-   * @brief Sets the animated image URL.
+   * @brief Sets the resource URL of the animated image to display.
    *
    * @param[in] url The URL of the animated image resource (e.g. GIF)
    * @return Reference to this for fluent chaining
    */
-  AnimatedImageView& SetImage(const Dali::String& url);
+  AnimatedImageView& SetResourceUrl(const Dali::String& url);
 
   /**
-   * @brief Gets the current image URL.
+   * @brief Gets the current resource URL.
    *
    * @return The URL of the animated image currently set on this view
    */
-  Dali::String GetUrl() const;
+  Dali::String GetResourceUrl() const;
 
   /**
    * @brief Sets the color multiplier applied to the image.

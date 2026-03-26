@@ -27,7 +27,7 @@ using namespace Dali::Ui;
  *
  * Sequence:
  *   1. ImageView created with PlaceholderImage set → placeholder shown immediately
- *   2. After 2 seconds, timer callback calls SetImage() → loading starts, placeholder re-shown
+ *   2. After 2 seconds, timer callback calls SetResourceUrl() → loading starts, placeholder re-shown
  *   3. Loading complete → ResourceReadySignal fired, placeholder removed automatically
  *
  * Button:
@@ -54,7 +54,7 @@ private:
     mImage = ImageView::New()
                .SetRequestedWidth(MATCH_PARENT)
                .SetRequestedHeight(WRAP_CONTENT)
-               .SetPlaceholderImage(RESOURCES_DIR "placeholder_image.png")
+               .SetPlaceholderUrl(RESOURCES_DIR "placeholder_image.png")
                .SetFittingMode(Dali::Ui::FittingMode::FIT_KEEP_ASPECT_RATIO)
                .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f));
     mImage.ResourceReadySignal().Connect(this, &PlaceholderSampleController::OnResourceReady);
@@ -112,8 +112,8 @@ private:
     const char* url = images[mImageIndex % imageCount];
     ++mImageIndex;
 
-    DALI_LOG_RELEASE_INFO("[Placeholder] SetImage(%s) — placeholder should appear.\n", url);
-    mImage.SetImage(url);
+    DALI_LOG_RELEASE_INFO("[Placeholder] SetResourceUrl(%s) — placeholder should appear.\n", url);
+    mImage.SetResourceUrl(url);
   }
 
   void OnResourceReady(View view)

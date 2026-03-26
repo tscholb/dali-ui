@@ -21,7 +21,7 @@
 #include <dali-ui-foundation/integration-api/view-impl.h>
 #include <dali-ui-foundation/public-api/image-view/image-view-types.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
-#include <dali/public-api/adaptor-framework/image-options.h>
+
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/math/vector4.h>
@@ -109,18 +109,6 @@ public: // Properties
        * @details Name "placeholderImage", type Property::STRING.
        */
       PLACEHOLDER_IMAGE,
-
-      /**
-       * @brief The horizontal wrap mode for texture coordinates.
-       * @details Name "wrapModeU", type Property::INTEGER.
-       */
-      WRAP_MODE_U,
-
-      /**
-       * @brief The vertical wrap mode for texture coordinates.
-       * @details Name "wrapModeV", type Property::INTEGER.
-       */
-      WRAP_MODE_V,
 
       /**
        * @brief Whether the view size is resolved synchronously during loading.
@@ -227,14 +215,14 @@ public: // Properties (required by DALI_PROPERTY_REGISTRATION)
 
 public: // API — Image
   /**
-   * @copydoc Dali::Ui::ImageView::SetImage
+   * @copydoc Dali::Ui::ImageView::SetResourceUrl
    */
-  void SetImage(const Dali::String& url);
+  void SetResourceUrl(const Dali::String& url);
 
   /**
-   * @copydoc Dali::Ui::ImageView::GetUrl
+   * @copydoc Dali::Ui::ImageView::GetResourceUrl
    */
-  Dali::String GetUrl() const;
+  Dali::String GetResourceUrl() const;
 
   /**
    * @copydoc Dali::Ui::ImageView::Reload
@@ -242,14 +230,14 @@ public: // API — Image
   void Reload();
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetPlaceholderImage
+   * @copydoc Dali::Ui::ImageView::SetPlaceholderUrl
    */
-  void SetPlaceholderImage(const Dali::String& url);
+  void SetPlaceholderUrl(const Dali::String& url);
 
   /**
-   * @copydoc Dali::Ui::ImageView::GetPlaceholderImage
+   * @copydoc Dali::Ui::ImageView::GetPlaceholderUrl
    */
-  Dali::String GetPlaceholderImage() const;
+  Dali::String GetPlaceholderUrl() const;
 
   /**
    * @copydoc Dali::Ui::ImageView::SetImageColor
@@ -272,25 +260,25 @@ public: // API — Image
   Vector4 GetPixelArea() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetAdjustViewSize
+   * @copydoc Dali::Ui::ImageView::SetFitSizeToImage
    */
-  void SetAdjustViewSize(bool adjustViewSize);
+  void SetFitSizeToImage(bool enable);
 
   /**
-   * @copydoc Dali::Ui::ImageView::GetAdjustViewSize
+   * @copydoc Dali::Ui::ImageView::IsFitSizeToImage
    */
-  bool GetAdjustViewSize() const;
+  bool IsFitSizeToImage() const;
 
 public: // API — Size & Fitting Control
   /**
    * @copydoc Dali::Ui::ImageView::SetSamplingMode
    */
-  void SetSamplingMode(Dali::SamplingMode::Type samplingMode);
+  void SetSamplingMode(Ui::SamplingMode::Type samplingMode);
 
   /**
    * @copydoc Dali::Ui::ImageView::GetSamplingMode
    */
-  Dali::SamplingMode::Type GetSamplingMode() const;
+  Ui::SamplingMode::Type GetSamplingMode() const;
 
   /**
    * @copydoc Dali::Ui::ImageView::SetFittingMode
@@ -311,26 +299,6 @@ public: // API — Size & Fitting Control
    * @copydoc Dali::Ui::ImageView::GetDesiredSize
    */
   Ui::ImageDimensions GetDesiredSize() const;
-
-  /**
-   * @copydoc Dali::Ui::ImageView::SetWrapModeU
-   */
-  void SetWrapModeU(Ui::WrapMode::Type wrapMode);
-
-  /**
-   * @copydoc Dali::Ui::ImageView::GetWrapModeU
-   */
-  Ui::WrapMode::Type GetWrapModeU() const;
-
-  /**
-   * @copydoc Dali::Ui::ImageView::SetWrapModeV
-   */
-  void SetWrapModeV(Ui::WrapMode::Type wrapMode);
-
-  /**
-   * @copydoc Dali::Ui::ImageView::GetWrapModeV
-   */
-  Ui::WrapMode::Type GetWrapModeV() const;
 
   /**
    * @copydoc Dali::Ui::ImageView::SetSynchronousSizing
@@ -506,31 +474,34 @@ private:
   ImageViewImpl& operator=(ImageViewImpl&&)      = delete;
 
 private: // Data
-  Dali::String             mUrl;
-  Vector4                  mPixelArea;
-  bool                     mPreMultipliedAlpha;
-  Dali::String             mPlaceholderImageUrl;
-  Dali::SamplingMode::Type mSamplingMode;
-  Ui::FittingMode::Type    mFittingMode;
-  Ui::ImageDimensions      mDesiredSize;
-  Ui::WrapMode::Type       mWrapModeU;
-  Ui::WrapMode::Type       mWrapModeV;
-  bool                     mSynchronousSizing;
-  Dali::String             mAlphaMaskUrl;
-  bool                     mCropToMask;
-  Ui::MaskingType::Type    mMaskingMode;
-  UiColor                  mImageColor;
-  Ui::ReleasePolicy::Type  mReleasePolicy;
-  bool                     mSynchronousLoading;
-  bool                     mFastTrackUploading;
-  bool                     mOrientationCorrection;
-  Vector4                  mBorder;
-  bool                     mBorderOnly;
-  bool                     mAdjustViewSize;
-  int                      mDepthIndex;
-  bool                     mVisualDirty;
-
   Ui::Visual::Base mVisual;
+
+  Dali::String mUrl;
+  Dali::String mPlaceholderImageUrl;
+  Dali::String mAlphaMaskUrl;
+
+  Vector4 mPixelArea;
+  Vector4 mBorder;
+
+  UiColor mImageColor;
+
+  Ui::SamplingMode::Type  mSamplingMode;
+  Ui::FittingMode::Type   mFittingMode;
+  Ui::MaskingType::Type   mMaskingMode;
+  Ui::ReleasePolicy::Type mReleasePolicy;
+  Ui::ImageDimensions     mDesiredSize;
+
+  int mDepthIndex;
+
+  bool mPreMultipliedAlpha;
+  bool mSynchronousSizing;
+  bool mCropToMask;
+  bool mSynchronousLoading;
+  bool mFastTrackUploading;
+  bool mOrientationCorrection;
+  bool mBorderOnly;
+  bool mFitSizeToImage;
+  bool mVisualDirty;
 };
 
 } // namespace Integration

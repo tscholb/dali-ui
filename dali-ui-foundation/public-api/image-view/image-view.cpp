@@ -64,7 +64,7 @@ ImageView ImageView::New(const Dali::String& url)
   impl->Initialize();
   if(!url.Empty())
   {
-    view.SetImage(url);
+    view.SetResourceUrl(url);
   }
   return view;
 }
@@ -79,15 +79,15 @@ void ImageView::Reload()
   Ui::GetImpl(*this).Reload();
 }
 
-ImageView& ImageView::SetImage(const Dali::String& url)
+ImageView& ImageView::SetResourceUrl(const Dali::String& url)
 {
-  Ui::GetImpl(*this).SetImage(url);
+  Ui::GetImpl(*this).SetResourceUrl(url);
   return *this;
 }
 
-Dali::String ImageView::GetUrl() const
+Dali::String ImageView::GetResourceUrl() const
 {
-  return Ui::GetImpl(*this).GetUrl();
+  return Ui::GetImpl(*this).GetResourceUrl();
 }
 
 ImageView& ImageView::SetPixelArea(const Vector4& pixelArea)
@@ -112,13 +112,13 @@ bool ImageView::GetPreMultipliedAlpha() const
   return Ui::GetImpl(*this).GetPreMultipliedAlpha();
 }
 
-ImageView& ImageView::SetSamplingMode(Dali::SamplingMode::Type samplingMode)
+ImageView& ImageView::SetSamplingMode(Ui::SamplingMode::Type samplingMode)
 {
   Ui::GetImpl(*this).SetSamplingMode(samplingMode);
   return *this;
 }
 
-Dali::SamplingMode::Type ImageView::GetSamplingMode() const
+Ui::SamplingMode::Type ImageView::GetSamplingMode() const
 {
   return Ui::GetImpl(*this).GetSamplingMode();
 }
@@ -189,37 +189,15 @@ bool ImageView::GetSynchronousLoading() const
   return Ui::GetImpl(*this).GetSynchronousLoading();
 }
 
-ImageView& ImageView::SetPlaceholderImage(const Dali::String& url)
+ImageView& ImageView::SetPlaceholderUrl(const Dali::String& url)
 {
-  Ui::GetImpl(*this).SetPlaceholderImage(url);
+  Ui::GetImpl(*this).SetPlaceholderUrl(url);
   return *this;
 }
 
-Dali::String ImageView::GetPlaceholderImage() const
+Dali::String ImageView::GetPlaceholderUrl() const
 {
-  return Ui::GetImpl(*this).GetPlaceholderImage();
-}
-
-ImageView& ImageView::SetWrapModeU(Ui::WrapMode::Type wrapMode)
-{
-  Ui::GetImpl(*this).SetWrapModeU(wrapMode);
-  return *this;
-}
-
-Ui::WrapMode::Type ImageView::GetWrapModeU() const
-{
-  return Ui::GetImpl(*this).GetWrapModeU();
-}
-
-ImageView& ImageView::SetWrapModeV(Ui::WrapMode::Type wrapMode)
-{
-  Ui::GetImpl(*this).SetWrapModeV(wrapMode);
-  return *this;
-}
-
-Ui::WrapMode::Type ImageView::GetWrapModeV() const
-{
-  return Ui::GetImpl(*this).GetWrapModeV();
+  return Ui::GetImpl(*this).GetPlaceholderUrl();
 }
 
 ImageView& ImageView::SetSynchronousSizing(bool synchronous)
@@ -299,15 +277,15 @@ bool ImageView::GetBorderOnly() const
   return Ui::GetImpl(*this).GetBorderOnly();
 }
 
-ImageView& ImageView::SetAdjustViewSize(bool adjustViewSize)
+ImageView& ImageView::SetFitSizeToImage(bool enable)
 {
-  Ui::GetImpl(*this).SetAdjustViewSize(adjustViewSize);
+  Ui::GetImpl(*this).SetFitSizeToImage(enable);
   return *this;
 }
 
-bool ImageView::GetAdjustViewSize() const
+bool ImageView::IsFitSizeToImage() const
 {
-  return Ui::GetImpl(*this).GetAdjustViewSize();
+  return Ui::GetImpl(*this).IsFitSizeToImage();
 }
 
 ImageView& ImageView::SetDepthIndex(int depthIndex)

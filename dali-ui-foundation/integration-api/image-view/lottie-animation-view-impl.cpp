@@ -58,7 +58,7 @@ LottieAnimationViewImpl::~LottieAnimationViewImpl()
 {
 }
 
-Dali::String LottieAnimationViewImpl::GetUrl() const
+Dali::String LottieAnimationViewImpl::GetResourceUrl() const
 {
   return mUrl;
 }
@@ -81,7 +81,7 @@ void LottieAnimationViewImpl::SetProperty(Dali::BaseObject* object, Dali::Proper
         Dali::String url;
         if(value.Get(url))
         {
-          impl.SetImage(url);
+          impl.SetResourceUrl(url);
         }
         break;
       }
@@ -100,7 +100,7 @@ Dali::Property::Value LottieAnimationViewImpl::GetProperty(Dali::BaseObject* obj
     {
       case LottieAnimationViewImpl::Property::IMAGE:
       {
-        value = impl.GetUrl();
+        value = impl.GetResourceUrl();
         break;
       }
     }
@@ -119,7 +119,7 @@ MeasuredSize LottieAnimationViewImpl::OnMeasure(float widthConstraint, float hei
   return ViewImpl::OnMeasure(widthConstraint, heightConstraint);
 }
 
-void LottieAnimationViewImpl::SetImage(const Dali::String& url)
+void LottieAnimationViewImpl::SetResourceUrl(const Dali::String& url)
 {
   if(mUrl != url)
   {

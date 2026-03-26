@@ -49,7 +49,7 @@ LottieAnimationView LottieAnimationView::New(const Dali::String& url)
   impl->Initialize();
   if(!url.Empty())
   {
-    view.SetImage(url);
+    view.SetResourceUrl(url);
   }
   return view;
 }
@@ -57,9 +57,9 @@ LottieAnimationView LottieAnimationView::DownCast(BaseHandle handle)
 {
   return Ui::View::DownCast<LottieAnimationView, Ui::Integration::LottieAnimationViewImpl>(handle);
 }
-void LottieAnimationView::SetImage(const Dali::String& url)
+void LottieAnimationView::SetResourceUrl(const Dali::String& url)
 {
-  Ui::GetImpl(*this).SetImage(url);
+  Ui::GetImpl(*this).SetResourceUrl(url);
 }
 void LottieAnimationView::Play()
 {

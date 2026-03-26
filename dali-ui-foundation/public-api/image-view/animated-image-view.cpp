@@ -48,7 +48,7 @@ AnimatedImageView  AnimatedImageView::New(const Dali::String& url)
   impl->Initialize();
   if(!url.Empty())
   {
-    view.SetImage(url);
+    view.SetResourceUrl(url);
   }
   return view;
 }
@@ -56,14 +56,14 @@ AnimatedImageView AnimatedImageView::DownCast(BaseHandle handle)
 {
   return Ui::View::DownCast<AnimatedImageView, Ui::Integration::AnimatedImageViewImpl>(handle);
 }
-AnimatedImageView& AnimatedImageView::SetImage(const Dali::String& url)
+AnimatedImageView& AnimatedImageView::SetResourceUrl(const Dali::String& url)
 {
-  Ui::GetImpl(*this).SetImage(url);
+  Ui::GetImpl(*this).SetResourceUrl(url);
   return *this;
 }
-Dali::String AnimatedImageView::GetUrl() const
+Dali::String AnimatedImageView::GetResourceUrl() const
 {
-  return Ui::GetImpl(*this).GetUrl();
+  return Ui::GetImpl(*this).GetResourceUrl();
 }
 AnimatedImageView& AnimatedImageView::Play()
 {

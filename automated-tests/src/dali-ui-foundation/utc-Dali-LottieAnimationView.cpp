@@ -120,13 +120,13 @@ int UtcDaliLottieAnimationViewDownCastN(void)
   END_TEST;
 }
 
-// SetImage
+// SetResourceUrl
 
 int UtcDaliLottieAnimationViewSetImageP(void)
 {
   TestApplication application;
   LottieAnimationView view = LottieAnimationView::New();
-  view.SetImage("animation.json");
+  view.SetResourceUrl("animation.json");
   DALI_TEST_CHECK(view);
   END_TEST;
 }

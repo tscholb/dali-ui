@@ -32,8 +32,8 @@
 #include <dali-ui-foundation/internal/views/view/view-data-impl.h>
 #include <dali-ui-foundation/internal/visuals/visual-base-impl.h>
 #include <dali-ui-foundation/public-api/align-enumerations.h>
-#include <dali-ui-foundation/public-api/controls/control-depth-index-ranges.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
+#include <dali-ui-foundation/public-api/view-depth-index-ranges.h>
 #include <dali-ui-foundation/public-api/visuals/image-visual-properties.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
 
@@ -64,8 +64,6 @@ DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "desiredHeight", FLOA
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "imageColor", VECTOR4, IMAGE_COLOR)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "placeholderImage", STRING, PLACEHOLDER_IMAGE)
-DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "wrapModeU", INTEGER, WRAP_MODE_U)
-DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "wrapModeV", INTEGER, WRAP_MODE_V)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "synchronousSizing", BOOLEAN, SYNCHRONOUS_SIZING)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "alphaMaskUrl", STRING, ALPHA_MASK_URL)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "cropToMask", BOOLEAN, CROP_TO_MASK)
@@ -86,27 +84,25 @@ DALI_TYPE_REGISTRATION_END()
 ImageViewImpl::ImageViewImpl()
 : ViewImpl(),
   mUrl(),
-  mPixelArea(0.0f, 0.0f, 1.0f, 1.0f),
-  mPreMultipliedAlpha(false),
   mPlaceholderImageUrl(),
-  mSamplingMode(Dali::SamplingMode::BOX_THEN_LINEAR),
-  mFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO),
-  mDesiredSize(),
-  mWrapModeU(Ui::WrapMode::DEFAULT),
-  mWrapModeV(Ui::WrapMode::DEFAULT),
-  mSynchronousSizing(false),
   mAlphaMaskUrl(),
-  mCropToMask(false),
-  mMaskingMode(Ui::MaskingType::MASKING_ON_RENDERING),
+  mPixelArea(0.0f, 0.0f, 1.0f, 1.0f),
+  mBorder(0.0f, 0.0f, 0.0f, 0.0f),
   mImageColor(Color::WHITE),
+  mSamplingMode(Ui::SamplingMode::BOX_THEN_LINEAR),
+  mFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO),
+  mMaskingMode(Ui::MaskingType::MASKING_ON_RENDERING),
   mReleasePolicy(Ui::ReleasePolicy::DETACHED),
+  mDesiredSize(),
+  mDepthIndex(0),
+  mPreMultipliedAlpha(false),
+  mSynchronousSizing(false),
+  mCropToMask(false),
   mSynchronousLoading(false),
   mFastTrackUploading(false),
   mOrientationCorrection(true),
-  mBorder(0.0f, 0.0f, 0.0f, 0.0f),
   mBorderOnly(false),
-  mAdjustViewSize(false),
-  mDepthIndex(0),
+  mFitSizeToImage(false),
   mVisualDirty(false)
 {
 }
@@ -133,7 +129,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         Dali::String url;
         if(value.Get(url))
         {
-          impl.SetImage(url);
+          impl.SetResourceUrl(url);
         }
         break;
       }
@@ -151,7 +147,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         int mode;
         if(value.Get(mode))
         {
-          impl.SetSamplingMode(static_cast<Dali::SamplingMode::Type>(mode));
+          impl.SetSamplingMode(static_cast<Ui::SamplingMode::Type>(mode));
         }
         break;
       }
@@ -196,25 +192,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         Dali::String url;
         if(value.Get(url))
         {
-          impl.SetPlaceholderImage(url);
-        }
-        break;
-      }
-      case Property::WRAP_MODE_U:
-      {
-        int wrapMode;
-        if(value.Get(wrapMode))
-        {
-          impl.SetWrapModeU(static_cast<Ui::WrapMode::Type>(wrapMode));
-        }
-        break;
-      }
-      case Property::WRAP_MODE_V:
-      {
-        int wrapMode;
-        if(value.Get(wrapMode))
-        {
-          impl.SetWrapModeV(static_cast<Ui::WrapMode::Type>(wrapMode));
+          impl.SetPlaceholderUrl(url);
         }
         break;
       }
@@ -313,7 +291,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool adjustViewSize;
         if(value.Get(adjustViewSize))
         {
-          impl.SetAdjustViewSize(adjustViewSize);
+          impl.SetFitSizeToImage(adjustViewSize);
         }
         break;
       }
@@ -340,7 +318,7 @@ Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali:
     switch(index)
     {
       case Property::IMAGE:
-        value = impl.GetUrl();
+        value = impl.GetResourceUrl();
         break;
       case Property::FITTING_MODE:
         value = static_cast<int>(impl.GetFittingMode());
@@ -361,13 +339,7 @@ Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali:
         value = impl.GetPreMultipliedAlpha();
         break;
       case Property::PLACEHOLDER_IMAGE:
-        value = impl.GetPlaceholderImage();
-        break;
-      case Property::WRAP_MODE_U:
-        value = static_cast<int>(impl.GetWrapModeU());
-        break;
-      case Property::WRAP_MODE_V:
-        value = static_cast<int>(impl.GetWrapModeV());
+        value = impl.GetPlaceholderUrl();
         break;
       case Property::SYNCHRONOUS_SIZING:
         value = impl.GetSynchronousSizing();
@@ -400,7 +372,7 @@ Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali:
         value = impl.GetBorderOnly();
         break;
       case Property::ADJUST_VIEW_SIZE:
-        value = impl.GetAdjustViewSize();
+        value = impl.IsFitSizeToImage();
         break;
       case Property::PIXEL_AREA:
         value = impl.GetPixelArea();
@@ -419,7 +391,7 @@ void ImageViewImpl::Reload()
   }
 }
 
-void ImageViewImpl::SetImage(const Dali::String& url)
+void ImageViewImpl::SetResourceUrl(const Dali::String& url)
 {
   if(mUrl != url)
   {
@@ -431,7 +403,7 @@ void ImageViewImpl::SetImage(const Dali::String& url)
   }
 }
 
-Dali::String ImageViewImpl::GetUrl() const
+Dali::String ImageViewImpl::GetResourceUrl() const
 {
   return mUrl;
 }
@@ -470,7 +442,7 @@ bool ImageViewImpl::GetPreMultipliedAlpha() const
   return mPreMultipliedAlpha;
 }
 
-void ImageViewImpl::SetPlaceholderImage(const Dali::String& url)
+void ImageViewImpl::SetPlaceholderUrl(const Dali::String& url)
 {
   if(mPlaceholderImageUrl != url)
   {
@@ -479,12 +451,12 @@ void ImageViewImpl::SetPlaceholderImage(const Dali::String& url)
   }
 }
 
-Dali::String ImageViewImpl::GetPlaceholderImage() const
+Dali::String ImageViewImpl::GetPlaceholderUrl() const
 {
   return mPlaceholderImageUrl;
 }
 
-void ImageViewImpl::SetSamplingMode(Dali::SamplingMode::Type samplingMode)
+void ImageViewImpl::SetSamplingMode(Ui::SamplingMode::Type samplingMode)
 {
   if(mSamplingMode != samplingMode)
   {
@@ -494,7 +466,7 @@ void ImageViewImpl::SetSamplingMode(Dali::SamplingMode::Type samplingMode)
   }
 }
 
-Dali::SamplingMode::Type ImageViewImpl::GetSamplingMode() const
+Ui::SamplingMode::Type ImageViewImpl::GetSamplingMode() const
 {
   return mSamplingMode;
 }
@@ -539,36 +511,6 @@ void ImageViewImpl::SetDesiredSize(Ui::ImageDimensions size)
 Ui::ImageDimensions ImageViewImpl::GetDesiredSize() const
 {
   return mDesiredSize;
-}
-
-void ImageViewImpl::SetWrapModeU(Ui::WrapMode::Type wrapMode)
-{
-  if(mWrapModeU != wrapMode)
-  {
-    mWrapModeU   = wrapMode;
-    mVisualDirty = true;
-    InvalidateMeasure();
-  }
-}
-
-Ui::WrapMode::Type ImageViewImpl::GetWrapModeU() const
-{
-  return mWrapModeU;
-}
-
-void ImageViewImpl::SetWrapModeV(Ui::WrapMode::Type wrapMode)
-{
-  if(mWrapModeV != wrapMode)
-  {
-    mWrapModeV   = wrapMode;
-    mVisualDirty = true;
-    InvalidateMeasure();
-  }
-}
-
-Ui::WrapMode::Type ImageViewImpl::GetWrapModeV() const
-{
-  return mWrapModeV;
 }
 
 void ImageViewImpl::SetSynchronousSizing(bool synchronous)
@@ -741,18 +683,18 @@ bool ImageViewImpl::GetBorderOnly() const
   return mBorderOnly;
 }
 
-void ImageViewImpl::SetAdjustViewSize(bool adjustViewSize)
+void ImageViewImpl::SetFitSizeToImage(bool enable)
 {
-  if(mAdjustViewSize != adjustViewSize)
+  if(mFitSizeToImage != enable)
   {
-    mAdjustViewSize = adjustViewSize;
+    mFitSizeToImage = enable;
     InvalidateMeasure();
   }
 }
 
-bool ImageViewImpl::GetAdjustViewSize() const
+bool ImageViewImpl::IsFitSizeToImage() const
 {
-  return mAdjustViewSize;
+  return mFitSizeToImage;
 }
 
 void ImageViewImpl::SetDepthIndex(int depthIndex)
@@ -833,7 +775,7 @@ void ImageViewImpl::OnViewResourceReady(Ui::View view)
   viewData.UnregisterVisual(ImageViewImpl::Property::PLACEHOLDER_IMAGE);
 
   // If AdjustViewSize is enabled, request a re-layout now that the natural size is known
-  if(mAdjustViewSize)
+  if(mFitSizeToImage)
   {
     InvalidateMeasure();
   }
@@ -877,7 +819,7 @@ MeasuredSize ImageViewImpl::OnMeasure(float widthConstraint, float heightConstra
     h = layoutH;
   }
 
-  if(mAdjustViewSize && naturalSize.width > 0.0f && naturalSize.height > 0.0f)
+  if(mFitSizeToImage && naturalSize.width > 0.0f && naturalSize.height > 0.0f)
   {
     float aspectRatio = naturalSize.height / naturalSize.width;
     bool  widthFixed  = (layoutW == MATCH_PARENT || layoutW > 0);
@@ -940,16 +882,6 @@ void ImageViewImpl::UpdateVisual()
     {
       map.Insert(Ui::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mDesiredSize.GetWidth()));
       map.Insert(Ui::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mDesiredSize.GetHeight()));
-    }
-
-    if(mWrapModeU != Ui::WrapMode::DEFAULT)
-    {
-      map.Insert(Ui::ImageVisual::Property::WRAP_MODE_U, static_cast<int>(mWrapModeU));
-    }
-
-    if(mWrapModeV != Ui::WrapMode::DEFAULT)
-    {
-      map.Insert(Ui::ImageVisual::Property::WRAP_MODE_V, static_cast<int>(mWrapModeV));
     }
 
     map.Insert(Ui::ImageVisual::Property::RELEASE_POLICY, static_cast<int>(mReleasePolicy));

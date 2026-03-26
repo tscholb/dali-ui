@@ -16,8 +16,8 @@
 #include <dali-ui-foundation/dali-ui-foundation.h>
 #include <dali-ui-foundation/public-api/image-view/image-view.h>
 #include <dali-ui-foundation/public-api/layouts/layout-types.h>
-#include <dali-ui-foundation/public-api/layouts/stack-layout.h>
 #include <dali-ui-foundation/public-api/layouts/stack-layout-params.h>
+#include <dali-ui-foundation/public-api/layouts/stack-layout.h>
 #include <dali/integration-api/debug.h>
 
 using namespace Dali;
@@ -98,17 +98,17 @@ private:
   View CreateButtonRow()
   {
     StackLayout row = StackLayout::New(StackOrientation::HORIZONTAL)
-      .Spacing(4.0f)
-      .SetRequestedWidth(MATCH_PARENT)
-      .SetRequestedHeight(100.0f)
-      .SetViewPadding(Extents(4, 4, 4, 4));
+                        .Spacing(4.0f)
+                        .SetRequestedWidth(MATCH_PARENT)
+                        .SetRequestedHeight(100.0f)
+                        .SetViewPadding(Extents(4, 4, 4, 4));
 
     for(int i = 0; i < MODE_COUNT; ++i)
     {
-      row.AddView(CreateModeButton(i));
+      row.Add(CreateModeButton(i));
     }
 
-    row.AddView(CreateSwapButton());
+    row.Add(CreateSwapButton());
 
     return row;
   }
@@ -116,20 +116,20 @@ private:
   View CreateModeButton(int index)
   {
     StackLayout button = StackLayout::New(StackOrientation::VERTICAL)
-      .SetRequestedWidth(WRAP_CONTENT)
-      .SetRequestedHeight(MATCH_PARENT)
-      .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f))
-      .SetBackgroundColor(index == mActiveIndex ? UiColor(0x4A90E2) : UiColor(0x333333))
-      .Children({
-        Label::New(MODES[index].name)
-          .SetRequestedWidth(MATCH_PARENT)
-          .SetRequestedHeight(MATCH_PARENT)
-          .SetFontSize(14.0f)
-          .SetMultiLine(true)
-          .SetTextColor(UiColor(0xFFFFFF))
-          .SetHorizontalTextAlignment(Text::Alignment::CENTER)
-          .SetVerticalTextAlignment(Text::Alignment::CENTER),
-      });
+                           .SetRequestedWidth(WRAP_CONTENT)
+                           .SetRequestedHeight(MATCH_PARENT)
+                           .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f))
+                           .SetBackgroundColor(index == mActiveIndex ? UiColor(0x4A90E2) : UiColor(0x333333))
+                           .Children({
+                             Label::New(MODES[index].name)
+                               .SetRequestedWidth(MATCH_PARENT)
+                               .SetRequestedHeight(MATCH_PARENT)
+                               .SetFontSize(14.0f)
+                               .SetMultiLine(true)
+                               .SetTextColor(UiColor(0xFFFFFF))
+                               .SetHorizontalTextAlignment(Text::Alignment::CENTER)
+                               .SetVerticalTextAlignment(Text::Alignment::CENTER),
+                           });
 
     button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewFittingModeController::OnModeButtonClicked);
 
@@ -140,20 +140,20 @@ private:
   View CreateSwapButton()
   {
     StackLayout button = StackLayout::New(StackOrientation::VERTICAL)
-      .SetRequestedWidth(WRAP_CONTENT)
-      .SetRequestedHeight(MATCH_PARENT)
-      .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f))
-      .SetBackgroundColor(UiColor(0x2E7D32))
-      .Children({
-        Label::New("SWAP\nIMAGE")
-          .SetRequestedWidth(MATCH_PARENT)
-          .SetRequestedHeight(MATCH_PARENT)
-          .SetFontSize(14.0f)
-          .SetMultiLine(true)
-          .SetTextColor(UiColor(0xFFFFFF))
-          .SetHorizontalTextAlignment(Text::Alignment::CENTER)
-          .SetVerticalTextAlignment(Text::Alignment::CENTER),
-      });
+                           .SetRequestedWidth(WRAP_CONTENT)
+                           .SetRequestedHeight(MATCH_PARENT)
+                           .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f))
+                           .SetBackgroundColor(UiColor(0x2E7D32))
+                           .Children({
+                             Label::New("SWAP\nIMAGE")
+                               .SetRequestedWidth(MATCH_PARENT)
+                               .SetRequestedHeight(MATCH_PARENT)
+                               .SetFontSize(14.0f)
+                               .SetMultiLine(true)
+                               .SetTextColor(UiColor(0xFFFFFF))
+                               .SetHorizontalTextAlignment(Text::Alignment::CENTER)
+                               .SetVerticalTextAlignment(Text::Alignment::CENTER),
+                           });
 
     button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewFittingModeController::OnSwapButtonClicked);
 
@@ -176,7 +176,7 @@ private:
   void OnSwapButtonClicked(View /*clickedView*/, const InputEvent& /*event*/)
   {
     mImageIndex = (mImageIndex + 1) % IMAGE_COUNT;
-    mImage.SetImage(IMAGES[mImageIndex]);
+    mImage.SetResourceUrl(IMAGES[mImageIndex]);
     DALI_LOG_RELEASE_INFO("Image changed to: %s\n", IMAGES[mImageIndex]);
   }
 

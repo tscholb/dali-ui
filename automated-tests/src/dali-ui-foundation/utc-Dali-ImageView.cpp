@@ -57,7 +57,7 @@ int UtcDaliImageViewNewWithUrlP(void)
   TestApplication application;
   ImageView view = ImageView::New("test.jpg");
   DALI_TEST_CHECK(view);
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("test.jpg"), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("test.jpg"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -122,14 +122,14 @@ int UtcDaliImageViewDownCastN(void)
   END_TEST;
 }
 
-// SetImage / GetUrl
+// SetResourceUrl / GetResourceUrl
 
 int UtcDaliImageViewSetGetImageP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
-  view.SetImage("image.jpg");
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("image.jpg"), TEST_LOCATION);
+  view.SetResourceUrl("image.jpg");
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("image.jpg"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -137,19 +137,19 @@ int UtcDaliImageViewSetImageNoChangeP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New("image.jpg");
-  view.SetImage("image.jpg");
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("image.jpg"), TEST_LOCATION);
+  view.SetResourceUrl("image.jpg");
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("image.jpg"), TEST_LOCATION);
   END_TEST;
 }
 
 // PlaceholderImage
 
-int UtcDaliImageViewSetGetPlaceholderImageP(void)
+int UtcDaliImageViewSetGetPlaceholderUrlP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
-  view.SetPlaceholderImage("placeholder.png");
-  DALI_TEST_EQUALS(view.GetPlaceholderImage(), Dali::String("placeholder.png"), TEST_LOCATION);
+  view.SetPlaceholderUrl("placeholder.png");
+  DALI_TEST_EQUALS(view.GetPlaceholderUrl(), Dali::String("placeholder.png"), TEST_LOCATION);
   END_TEST;
 }
 
@@ -178,22 +178,6 @@ int UtcDaliImageViewSetGetDesiredSizeP(void)
   view.SetDesiredSize(ImageDimensions(100, 200));
   DALI_TEST_EQUALS(view.GetDesiredSize().GetWidth(), static_cast<uint16_t>(100), TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetDesiredSize().GetHeight(), static_cast<uint16_t>(200), TEST_LOCATION);
-  END_TEST;
-}
-
-// WrapMode
-
-int UtcDaliImageViewSetGetWrapModeP(void)
-{
-  TestApplication application;
-  ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.GetWrapModeU(), Ui::WrapMode::DEFAULT, TEST_LOCATION);
-  DALI_TEST_EQUALS(view.GetWrapModeV(), Ui::WrapMode::DEFAULT, TEST_LOCATION);
-
-  view.SetWrapModeU(Ui::WrapMode::REPEAT);
-  view.SetWrapModeV(Ui::WrapMode::CLAMP_TO_EDGE);
-  DALI_TEST_EQUALS(view.GetWrapModeU(), Ui::WrapMode::REPEAT, TEST_LOCATION);
-  DALI_TEST_EQUALS(view.GetWrapModeV(), Ui::WrapMode::CLAMP_TO_EDGE, TEST_LOCATION);
   END_TEST;
 }
 
@@ -295,13 +279,13 @@ int UtcDaliImageViewSetGetSamplingModeP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.GetSamplingMode(), Dali::SamplingMode::BOX_THEN_LINEAR, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetSamplingMode(), Ui::SamplingMode::BOX_THEN_LINEAR, TEST_LOCATION);
 
-  view.SetSamplingMode(Dali::SamplingMode::NEAREST);
-  DALI_TEST_EQUALS(view.GetSamplingMode(), Dali::SamplingMode::NEAREST, TEST_LOCATION);
+  view.SetSamplingMode(Ui::SamplingMode::NEAREST);
+  DALI_TEST_EQUALS(view.GetSamplingMode(), Ui::SamplingMode::NEAREST, TEST_LOCATION);
 
-  view.SetSamplingMode(Dali::SamplingMode::LINEAR);
-  DALI_TEST_EQUALS(view.GetSamplingMode(), Dali::SamplingMode::LINEAR, TEST_LOCATION);
+  view.SetSamplingMode(Ui::SamplingMode::LINEAR);
+  DALI_TEST_EQUALS(view.GetSamplingMode(), Ui::SamplingMode::LINEAR, TEST_LOCATION);
   END_TEST;
 }
 
@@ -309,9 +293,9 @@ int UtcDaliImageViewSetSamplingModeNoChangeP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
-  view.SetSamplingMode(Dali::SamplingMode::NEAREST);
-  view.SetSamplingMode(Dali::SamplingMode::NEAREST); // same value — should not dirty
-  DALI_TEST_EQUALS(view.GetSamplingMode(), Dali::SamplingMode::NEAREST, TEST_LOCATION);
+  view.SetSamplingMode(Ui::SamplingMode::NEAREST);
+  view.SetSamplingMode(Ui::SamplingMode::NEAREST); // same value — should not dirty
+  DALI_TEST_EQUALS(view.GetSamplingMode(), Ui::SamplingMode::NEAREST, TEST_LOCATION);
   END_TEST;
 }
 
@@ -349,11 +333,11 @@ int UtcDaliImageViewPropertySamplingModeP(void)
   ImageView view = ImageView::New();
 
   view.SetProperty(Dali::Property::Index(Dali::PROPERTY_REGISTRATION_START_INDEX + 2), // SAMPLING_MODE
-                   static_cast<int>(Dali::SamplingMode::NO_FILTER));
+                   static_cast<int>(Ui::SamplingMode::NO_FILTER));
   Dali::Property::Value value = view.GetProperty(Dali::Property::Index(Dali::PROPERTY_REGISTRATION_START_INDEX + 2));
   int mode = 0;
   DALI_TEST_CHECK(value.Get(mode));
-  DALI_TEST_EQUALS(static_cast<Dali::SamplingMode::Type>(mode), Dali::SamplingMode::NO_FILTER, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Ui::SamplingMode::Type>(mode), Ui::SamplingMode::NO_FILTER, TEST_LOCATION);
   END_TEST;
 }
 
@@ -362,9 +346,9 @@ int UtcDaliImageViewPropertyReleasePolicyP(void)
   TestApplication application;
   ImageView view = ImageView::New();
 
-  view.SetProperty(Dali::Property::Index(Dali::PROPERTY_REGISTRATION_START_INDEX + 14), // RELEASE_POLICY
+  view.SetProperty(Dali::Property::Index(Dali::PROPERTY_REGISTRATION_START_INDEX + 12), // RELEASE_POLICY
                    static_cast<int>(Ui::ReleasePolicy::NEVER));
-  Dali::Property::Value value = view.GetProperty(Dali::Property::Index(Dali::PROPERTY_REGISTRATION_START_INDEX + 14));
+  Dali::Property::Value value = view.GetProperty(Dali::Property::Index(Dali::PROPERTY_REGISTRATION_START_INDEX + 12));
   int policy = 0;
   DALI_TEST_CHECK(value.Get(policy));
   DALI_TEST_EQUALS(static_cast<Ui::ReleasePolicy::Type>(policy), Ui::ReleasePolicy::NEVER, TEST_LOCATION);
@@ -468,48 +452,48 @@ int UtcDaliImageViewChainingP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New()
-                     .SetImage("image.jpg")
+                     .SetResourceUrl("image.jpg")
                      .SetFittingMode(Ui::FittingMode::FILL)
                      .SetImageColor(UiColor(1.0f, 1.0f, 1.0f, 0.5f));
   DALI_TEST_CHECK(view);
-  DALI_TEST_EQUALS(view.GetUrl(), Dali::String("image.jpg"), TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetResourceUrl(), Dali::String("image.jpg"), TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetFittingMode(), Ui::FittingMode::FILL, TEST_LOCATION);
   END_TEST;
 }
 
-// AdjustViewSize
+// FitSizeToImage
 
-int UtcDaliImageViewSetGetAdjustViewSizeP(void)
+int UtcDaliImageViewSetIsFitSizeToImageP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.GetAdjustViewSize(), false, TEST_LOCATION); // default: disabled
+  DALI_TEST_EQUALS(view.IsFitSizeToImage(), false, TEST_LOCATION); // default: disabled
 
-  view.SetAdjustViewSize(true);
-  DALI_TEST_EQUALS(view.GetAdjustViewSize(), true, TEST_LOCATION);
+  view.SetFitSizeToImage(true);
+  DALI_TEST_EQUALS(view.IsFitSizeToImage(), true, TEST_LOCATION);
 
-  view.SetAdjustViewSize(false);
-  DALI_TEST_EQUALS(view.GetAdjustViewSize(), false, TEST_LOCATION);
+  view.SetFitSizeToImage(false);
+  DALI_TEST_EQUALS(view.IsFitSizeToImage(), false, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliImageViewSetAdjustViewSizeNoChangeP(void)
+int UtcDaliImageViewSetFitSizeToImageNoChangeP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
-  view.SetAdjustViewSize(true);
-  view.SetAdjustViewSize(true); // same value — no update
-  DALI_TEST_EQUALS(view.GetAdjustViewSize(), true, TEST_LOCATION);
+  view.SetFitSizeToImage(true);
+  view.SetFitSizeToImage(true); // same value — no update
+  DALI_TEST_EQUALS(view.IsFitSizeToImage(), true, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliImageViewPropertyAdjustViewSizeP(void)
+int UtcDaliImageViewPropertyFitSizeToImageP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
 
   // ADJUST_VIEW_SIZE comes after BORDER_ONLY in the property enum
-  const Dali::Property::Index adjustViewSizeIndex = Dali::PROPERTY_REGISTRATION_START_INDEX + 20; // ADJUST_VIEW_SIZE
+  const Dali::Property::Index adjustViewSizeIndex = Dali::PROPERTY_REGISTRATION_START_INDEX + 18; // ADJUST_VIEW_SIZE
   view.SetProperty(adjustViewSizeIndex, true);
   Dali::Property::Value value = view.GetProperty(adjustViewSizeIndex);
   bool result                 = false;

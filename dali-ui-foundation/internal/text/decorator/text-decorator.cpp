@@ -34,8 +34,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/internal/graphics/builtin-shader-extern-gen.h>
-#include <dali-ui-foundation/public-api/controls/control-depth-index-ranges.h>
 #include <dali-ui-foundation/public-api/image-view/image-view.h>
+#include <dali-ui-foundation/public-api/view-depth-index-ranges.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
@@ -1213,7 +1213,7 @@ struct Decorator::Impl : public ConnectionTracker
            ? (mHandleImages[type][HANDLE_IMAGE_PRESSED].size() ? HANDLE_IMAGE_PRESSED : HANDLE_IMAGE_RELEASED)
            : HANDLE_IMAGE_RELEASED);
 
-      handle.actor.SetImage(ToDaliString(mHandleImages[type][imageType]));
+      handle.actor.SetResourceUrl(ToDaliString(mHandleImages[type][imageType]));
     }
 
     if(HANDLE_TYPE_COUNT != markerType)
@@ -1224,7 +1224,7 @@ struct Decorator::Impl : public ConnectionTracker
           (handle.pressed ? (mHandleImages[markerType][HANDLE_IMAGE_PRESSED].size() ? HANDLE_IMAGE_PRESSED
                                                                                     : HANDLE_IMAGE_RELEASED)
                           : HANDLE_IMAGE_RELEASED);
-        handle.markerActor.SetImage(ToDaliString(mHandleImages[markerType][markerImageType]));
+        handle.markerActor.SetResourceUrl(ToDaliString(mHandleImages[markerType][markerImageType]));
       }
     }
 
@@ -1425,7 +1425,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       if(handle.actor)
       {
-        handle.actor.SetImage(ToDaliString(mHandleImages[type][HANDLE_IMAGE_RELEASED]));
+        handle.actor.SetResourceUrl(ToDaliString(mHandleImages[type][HANDLE_IMAGE_RELEASED]));
       }
       handle.pressed = false;
 
@@ -2264,7 +2264,7 @@ void Decorator::SetHandleActive(HandleType handleType, bool active)
     ImageView  imageView               = mImpl->mHandle[handleType].actor;
     if(imageReleased && imageView)
     {
-      imageView.SetImage(ToDaliString(mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED]));
+      imageView.SetResourceUrl(ToDaliString(mImpl->mHandleImages[handleType][HANDLE_IMAGE_RELEASED]));
     }
   }
 }

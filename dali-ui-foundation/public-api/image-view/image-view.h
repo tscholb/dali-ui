@@ -17,14 +17,16 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/signals/dali-signal.h>
+
+// INTERNAL INCLUDES
 #include <dali-ui-foundation/public-api/image-view/image-view-types.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
 #include <dali-ui-foundation/public-api/view.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
-#include <dali/public-api/adaptor-framework/image-options.h>
-#include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -35,6 +37,7 @@ namespace Integration DALI_INTERNAL
 class ImageViewImpl;
 }
 
+#include "image-view.autogen.h"
 /**
  * @brief ImageView is a View for displaying an image resource.
  *
@@ -46,13 +49,12 @@ class ImageViewImpl;
  *
  * @code
  * ImageView view = ImageView::New("image.png");
- * view.SetAdjustViewSize(true);
+ * view.SetFitSizeToImage(true);
  * view.ResourceReadySignal().Connect(...);
  * @endcode
  */
 class DALI_UI_API ImageView : public View
 {
-public:
 public: // Creation & Destruction
   /**
    * @brief Creates an uninitialized ImageView handle.
@@ -129,9 +131,11 @@ public: // Static Methods
    */
   static ImageView DownCast(BaseHandle handle);
 
+  // @CHAIN_START(ImageView, View)
+
 public: // Image
   /**
-   * @brief Sets the image URL.
+   * @brief Sets the resource URL of the image to display.
    *
    * The image is loaded asynchronously. Use ResourceReadySignal() to be
    * notified when loading completes.
@@ -139,14 +143,14 @@ public: // Image
    * @param[in] url The URL of the image resource
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetImage(const Dali::String& url);
+  ImageView& SetResourceUrl(const Dali::String& url);
 
   /**
    * @brief Gets the current image URL.
    *
    * @return The URL of the image currently set on this view
    */
-  Dali::String GetUrl() const;
+  Dali::String GetResourceUrl() const;
 
   /**
    * @brief Reloads the current image from its URL.
@@ -156,19 +160,19 @@ public: // Image
   void Reload();
 
   /**
-   * @brief Sets a placeholder image shown while the main image is loading.
+   * @brief Sets the URL of a placeholder image shown while the main image is loading.
    *
    * @param[in] url The URL of the placeholder image resource
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetPlaceholderImage(const Dali::String& url);
+  ImageView& SetPlaceholderUrl(const Dali::String& url);
 
   /**
    * @brief Gets the placeholder image URL.
    *
    * @return The URL of the placeholder image, or an empty string if not set
    */
-  Dali::String GetPlaceholderImage() const;
+  Dali::String GetPlaceholderUrl() const;
 
   /**
    * @brief Sets the color multiplier applied to the image.
@@ -206,23 +210,23 @@ public: // Image
   Vector4 GetPixelArea() const;
 
   /**
-   * @brief Sets whether the view size should be adjusted to match the image's aspect ratio.
+   * @brief Sets whether the view size is fitted to the image's natural aspect ratio.
    *
    * When enabled, if one dimension is fixed (via layout params or MATCH_PARENT) and the
    * other is unconstrained, the unconstrained dimension is automatically computed from
    * the image's natural aspect ratio after the image has loaded.
    *
-   * @param[in] adjustViewSize True to enable automatic aspect-ratio adjustment
+   * @param[in] enable True to fit the view size to the image
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetAdjustViewSize(bool adjustViewSize);
+  ImageView& SetFitSizeToImage(bool enable);
 
   /**
-   * @brief Gets whether view size adjustment is enabled.
+   * @brief Returns whether the view size is fitted to the image's natural aspect ratio.
    *
-   * @return True if automatic aspect-ratio adjustment is enabled
+   * @return True if fit-size-to-image is enabled
    */
-  bool GetAdjustViewSize() const;
+  bool IsFitSizeToImage() const;
 
 public: // Size & Fitting Control
   /**
@@ -231,14 +235,14 @@ public: // Size & Fitting Control
    * @param[in] samplingMode The sampling mode to use
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetSamplingMode(Dali::SamplingMode::Type samplingMode);
+  ImageView& SetSamplingMode(Ui::SamplingMode::Type samplingMode);
 
   /**
    * @brief Gets the sampling mode.
    *
    * @return The current sampling mode
    */
-  Dali::SamplingMode::Type GetSamplingMode() const;
+  Ui::SamplingMode::Type GetSamplingMode() const;
 
   /**
    * @brief Sets how the image is fitted within the view bounds.
@@ -269,36 +273,6 @@ public: // Size & Fitting Control
    * @return The currently requested desired size
    */
   Ui::ImageDimensions GetDesiredSize() const;
-
-  /**
-   * @brief Sets the horizontal wrap mode for texture coordinates.
-   *
-   * @param[in] wrapMode The horizontal wrap mode
-   * @return Reference to this for fluent chaining
-   */
-  ImageView& SetWrapModeU(Ui::WrapMode::Type wrapMode);
-
-  /**
-   * @brief Gets the horizontal wrap mode.
-   *
-   * @return The current horizontal wrap mode
-   */
-  Ui::WrapMode::Type GetWrapModeU() const;
-
-  /**
-   * @brief Sets the vertical wrap mode for texture coordinates.
-   *
-   * @param[in] wrapMode The vertical wrap mode
-   * @return Reference to this for fluent chaining
-   */
-  ImageView& SetWrapModeV(Ui::WrapMode::Type wrapMode);
-
-  /**
-   * @brief Gets the vertical wrap mode.
-   *
-   * @return The current vertical wrap mode
-   */
-  Ui::WrapMode::Type GetWrapModeV() const;
 
   /**
    * @brief Sets whether the view size is determined synchronously during image loading.
@@ -526,6 +500,8 @@ public: // Not intended for application developers
    */
   explicit DALI_INTERNAL ImageView(Dali::Internal::CustomActor* internal);
   /// @endcond
+
+  // @CHAIN_END
 
 public:
   DALI_UI_CHAIN_VIEW_METHODS(ImageView)

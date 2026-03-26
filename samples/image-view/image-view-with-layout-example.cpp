@@ -110,7 +110,7 @@ private:
   {
     ImageView imageView = ImageView::DownCast(view);
     DALI_LOG_RELEASE_INFO("[ImageView] ResourceReadySignal fired. url=%s status=%d\n",
-                          imageView.GetUrl().CStr(),
+                          imageView.GetResourceUrl().CStr(),
                           static_cast<int>(imageView.GetLoadingStatus()));
   }
 

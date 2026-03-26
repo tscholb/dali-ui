@@ -87,16 +87,16 @@ public: // Properties (required by DALI_PROPERTY_REGISTRATION)
 
 public: // API
   /**
-   * @copydoc Dali::Ui::LottieAnimationView::SetImage
+   * @copydoc Dali::Ui::LottieAnimationView::SetResourceUrl
    */
-  void SetImage(const Dali::String& url);
+  void SetResourceUrl(const Dali::String& url);
 
   /**
    * @brief Gets the current Lottie animation file URL.
    *
    * @return The URL of the Lottie JSON file currently set on this view
    */
-  Dali::String GetUrl() const;
+  Dali::String GetResourceUrl() const;
 
   /**
    * @copydoc Dali::Ui::LottieAnimationView::Play
