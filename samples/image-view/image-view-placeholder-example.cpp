@@ -116,10 +116,11 @@ private:
     mImage.SetImage(url);
   }
 
-  void OnResourceReady(ImageView view)
+  void OnResourceReady(View view)
   {
+    ImageView imageView = ImageView::DownCast(view);
     DALI_LOG_RELEASE_INFO("[Placeholder] ResourceReadySignal fired — placeholder should be gone. status=%d\n",
-                   static_cast<int>(view.GetLoadingStatus()));
+                          static_cast<int>(imageView.GetLoadingStatus()));
   }
 
   void OnKeyEvent(const KeyEvent& event)

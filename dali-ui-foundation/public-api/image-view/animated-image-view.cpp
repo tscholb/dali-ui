@@ -1,10 +1,40 @@
+/*
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #include <dali-ui-foundation/integration-api/image-view/animated-image-view-impl.h>
 #include <dali-ui-foundation/public-api/image-view/animated-image-view.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
+
 namespace Dali
 {
 namespace Ui
 {
+
+inline Integration::AnimatedImageViewImpl& GetImpl(AnimatedImageView& obj)
+{
+  DALI_ASSERT_ALWAYS(obj);
+  return static_cast<Integration::AnimatedImageViewImpl&>(obj.GetImplementation());
+}
+
+inline const Integration::AnimatedImageViewImpl& GetImpl(const AnimatedImageView& obj)
+{
+  DALI_ASSERT_ALWAYS(obj);
+  return static_cast<const Integration::AnimatedImageViewImpl&>(obj.GetImplementation());
+}
 AnimatedImageView::AnimatedImageView()                                            = default;
 AnimatedImageView::~AnimatedImageView()                                           = default;
 AnimatedImageView::AnimatedImageView(const AnimatedImageView& rhs)                = default;
@@ -13,7 +43,9 @@ AnimatedImageView& AnimatedImageView::operator=(const AnimatedImageView& rhs)   
 AnimatedImageView& AnimatedImageView::operator=(AnimatedImageView&& rhs) noexcept = default;
 AnimatedImageView  AnimatedImageView::New(const Dali::String& url)
 {
-  AnimatedImageView view = Integration::AnimatedImageViewImpl::New();
+  Integration::AnimatedImageViewImplPtr impl = Integration::AnimatedImageViewImpl::New();
+  AnimatedImageView                     view(*impl);
+  impl->Initialize();
   if(!url.Empty())
   {
     view.SetImage(url);
@@ -70,13 +102,9 @@ Ui::Visual::ResourceStatus AnimatedImageView::GetLoadingStatus() const
 {
   return Ui::GetImpl(*this).GetLoadingStatus();
 }
-AnimatedImageView::ImageViewSignal& AnimatedImageView::ResourceReadySignal()
+View::ResourceReadySignalType& AnimatedImageView::ResourceReadySignal()
 {
-  return Ui::GetImpl(*this).ResourceReadySignal();
-}
-AnimatedImageView::ImageViewSignal& AnimatedImageView::ResourceLoadedSignal()
-{
-  return Ui::GetImpl(*this).ResourceLoadedSignal();
+  return View::ResourceReadySignal();
 }
 AnimatedImageView::AnimatedImageView(Integration::AnimatedImageViewImpl& implementation)
 : View(implementation)

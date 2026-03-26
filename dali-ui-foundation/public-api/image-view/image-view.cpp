@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 #include <dali-ui-foundation/integration-api/image-view/image-view-impl.h>
 #include <dali-ui-foundation/public-api/image-view/image-view.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
@@ -6,6 +23,18 @@ namespace Dali
 {
 namespace Ui
 {
+
+inline Integration::ImageViewImpl& GetImpl(ImageView& obj)
+{
+  DALI_ASSERT_ALWAYS(obj);
+  return static_cast<Integration::ImageViewImpl&>(obj.GetImplementation());
+}
+
+inline const Integration::ImageViewImpl& GetImpl(const ImageView& obj)
+{
+  DALI_ASSERT_ALWAYS(obj);
+  return static_cast<const Integration::ImageViewImpl&>(obj.GetImplementation());
+}
 
 ImageView::ImageView()
 {
@@ -22,14 +51,22 @@ ImageView::~ImageView()
 
 ImageView ImageView::New()
 {
-  return Ui::Integration::ImageViewImpl::New();
+  Integration::ImageViewImplPtr impl = Integration::ImageViewImpl::New();
+  ImageView                     view(*impl);
+  impl->Initialize();
+  return view;
 }
 
 ImageView ImageView::New(const Dali::String& url)
 {
-  ImageView imageView = Integration::ImageViewImpl::New();
-  imageView.SetImage(url);
-  return imageView;
+  Integration::ImageViewImplPtr impl = Integration::ImageViewImpl::New();
+  ImageView                     view(*impl);
+  impl->Initialize();
+  if(!url.Empty())
+  {
+    view.SetImage(url);
+  }
+  return view;
 }
 
 ImageView ImageView::DownCast(BaseHandle handle)
@@ -273,19 +310,20 @@ bool ImageView::GetAdjustViewSize() const
   return Ui::GetImpl(*this).GetAdjustViewSize();
 }
 
+ImageView& ImageView::SetDepthIndex(int depthIndex)
+{
+  Ui::GetImpl(*this).SetDepthIndex(depthIndex);
+  return *this;
+}
+
 Ui::Visual::ResourceStatus ImageView::GetLoadingStatus() const
 {
   return Ui::GetImpl(*this).GetLoadingStatus();
 }
 
-ImageView::ImageViewSignal& ImageView::ResourceReadySignal()
+View::ResourceReadySignalType& ImageView::ResourceReadySignal()
 {
-  return Ui::GetImpl(*this).ResourceReadySignal();
-}
-
-ImageView::ImageViewSignal& ImageView::ResourceLoadedSignal()
-{
-  return Ui::GetImpl(*this).ResourceLoadedSignal();
+  return View::ResourceReadySignal();
 }
 
 ImageView::ImageView(Integration::ImageViewImpl& implementation)

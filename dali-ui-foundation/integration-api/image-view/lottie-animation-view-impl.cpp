@@ -1,8 +1,26 @@
+/*
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+// CLASS HEADER
 #include "lottie-animation-view-impl.h"
+
+// EXTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
-#include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/base-object.h>
 
 namespace Dali
 {
@@ -15,7 +33,10 @@ namespace
 {
 BaseHandle Create()
 {
-  return LottieAnimationView::New();
+  LottieAnimationViewImplPtr impl = LottieAnimationViewImpl::New();
+  Ui::View                   view(*impl);
+  impl->Initialize();
+  return view;
 }
 // clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(LottieAnimationViewImpl, ViewImpl, Create)
@@ -24,7 +45,6 @@ DALI_PROPERTY_REGISTRATION(Ui::Integration, LottieAnimationViewImpl, "image", ST
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
-
 } // namespace
 
 LottieAnimationViewImpl::LottieAnimationViewImpl()
@@ -43,20 +63,17 @@ Dali::String LottieAnimationViewImpl::GetUrl() const
   return mUrl;
 }
 
-Ui::LottieAnimationView LottieAnimationViewImpl::New()
+LottieAnimationViewImplPtr LottieAnimationViewImpl::New()
 {
-  IntrusivePtr<LottieAnimationViewImpl> impl = new LottieAnimationViewImpl();
-  Ui::LottieAnimationView               handle(*impl);
-  impl->Initialize();
-  return handle;
+  return new LottieAnimationViewImpl();
 }
 
 void LottieAnimationViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value)
 {
-  Ui::LottieAnimationView view = Ui::LottieAnimationView::DownCast(Dali::BaseHandle(object));
+  Ui::View view = Ui::View::DownCast(Dali::BaseHandle(object));
   if(view)
   {
-    LottieAnimationViewImpl& impl = static_cast<LottieAnimationViewImpl&>(view.GetImplementation());
+    LottieAnimationViewImpl& impl = static_cast<LottieAnimationViewImpl&>(GetImpl(view));
     switch(index)
     {
       case LottieAnimationViewImpl::Property::IMAGE:
@@ -74,11 +91,11 @@ void LottieAnimationViewImpl::SetProperty(Dali::BaseObject* object, Dali::Proper
 
 Dali::Property::Value LottieAnimationViewImpl::GetProperty(Dali::BaseObject* object, Dali::Property::Index index)
 {
-  Dali::Property::Value   value;
-  Ui::LottieAnimationView view = Ui::LottieAnimationView::DownCast(Dali::BaseHandle(object));
+  Dali::Property::Value value;
+  Ui::View              view = Ui::View::DownCast(Dali::BaseHandle(object));
   if(view)
   {
-    LottieAnimationViewImpl& impl = static_cast<LottieAnimationViewImpl&>(view.GetImplementation());
+    LottieAnimationViewImpl& impl = static_cast<LottieAnimationViewImpl&>(GetImpl(view));
     switch(index)
     {
       case LottieAnimationViewImpl::Property::IMAGE:

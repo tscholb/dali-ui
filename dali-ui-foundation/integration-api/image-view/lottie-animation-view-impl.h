@@ -18,8 +18,8 @@
  */
 
 #include <dali-ui-foundation/integration-api/view-impl.h>
-#include <dali-ui-foundation/public-api/image-view/lottie-animation-view.h>
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 namespace Dali
 {
@@ -27,6 +27,9 @@ namespace Ui
 {
 namespace Integration
 {
+
+class LottieAnimationViewImpl;
+using LottieAnimationViewImplPtr = IntrusivePtr<LottieAnimationViewImpl>;
 
 /**
  * @brief This is the internal implementation class for LottieAnimationView.
@@ -70,11 +73,11 @@ protected: // Construction & Destruction
 
 public: // Creation
   /**
-   * @brief Creates a new LottieAnimationView.
+   * @brief Creates a new LottieAnimationViewImpl.
    *
-   * @return A handle to the newly allocated LottieAnimationView
+   * @return An intrusive pointer to the newly allocated LottieAnimationViewImpl
    */
-  static Ui::LottieAnimationView New();
+  static LottieAnimationViewImplPtr New();
 
 public: // Properties (required by DALI_PROPERTY_REGISTRATION)
   /// @cond internal
@@ -150,18 +153,5 @@ private: // Data
 };
 
 } // namespace Integration
-
-inline Integration::LottieAnimationViewImpl& GetImpl(Ui::LottieAnimationView& obj)
-{
-  DALI_ASSERT_ALWAYS(obj);
-  return static_cast<Integration::LottieAnimationViewImpl&>(obj.GetImplementation());
-}
-
-inline const Integration::LottieAnimationViewImpl& GetImpl(const Ui::LottieAnimationView& obj)
-{
-  DALI_ASSERT_ALWAYS(obj);
-  return static_cast<const Integration::LottieAnimationViewImpl&>(obj.GetImplementation());
-}
-
 } // namespace Ui
 } // namespace Dali

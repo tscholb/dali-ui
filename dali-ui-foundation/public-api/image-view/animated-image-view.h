@@ -48,8 +48,6 @@ class AnimatedImageViewImpl;
 class DALI_UI_API AnimatedImageView : public View
 {
 public:
-  using ImageViewSignal = Signal<void(AnimatedImageView)>;
-
 public: // Creation & Destruction
   /**
    * @brief Creates an uninitialized AnimatedImageView handle.
@@ -203,14 +201,7 @@ public: // Loading Status & Signals
    *
    * @return A reference to the ResourceReady signal
    */
-  ImageViewSignal& ResourceReadySignal();
-
-  /**
-   * @brief Returns the signal emitted when the image resource has been loaded.
-   *
-   * @return A reference to the ResourceLoaded signal
-   */
-  ImageViewSignal& ResourceLoadedSignal();
+  ResourceReadySignalType& ResourceReadySignal();
 
 public: // Not intended for application developers
   /// @cond internal

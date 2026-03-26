@@ -1,10 +1,27 @@
+/*
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+// CLASS HEADER
 #include "image-view-impl.h"
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
-#include <dali/public-api/common/dali-common.h>
 #include <algorithm>
 
 // INTERNAL INCLUDES
@@ -26,14 +43,17 @@ namespace Ui
 {
 namespace Integration
 {
+
 namespace
 {
 BaseHandle CreateImageView()
 {
-  return ImageView::New();
+  ImageViewImplPtr impl = ImageViewImpl::New();
+  Ui::View         view(*impl);
+  impl->Initialize();
+  return view;
 }
-
-// Type Registration
+// clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(ImageViewImpl, ViewImpl, CreateImageView)
 
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "image", STRING, IMAGE)
@@ -60,7 +80,8 @@ DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "adjustViewSize", BOO
 DALI_ANIMATABLE_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "pixelArea", VECTOR4, PIXEL_AREA)
 
 DALI_TYPE_REGISTRATION_END()
-} // unnamed namespace
+// clang-format on
+} // namespace
 
 ImageViewImpl::ImageViewImpl()
 : ViewImpl(),
@@ -94,20 +115,17 @@ ImageViewImpl::~ImageViewImpl()
 {
 }
 
-Ui::ImageView ImageViewImpl::New()
+ImageViewImplPtr ImageViewImpl::New()
 {
-  IntrusivePtr<ImageViewImpl> impl = new ImageViewImpl();
-  Ui::ImageView               handle(*impl);
-  impl->Initialize();
-  return handle;
+  return new ImageViewImpl();
 }
 
 void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value)
 {
-  Ui::ImageView view = Ui::ImageView::DownCast(Dali::BaseHandle(object));
+  Ui::View view = Ui::View::DownCast(Dali::BaseHandle(object));
   if(view)
   {
-    ImageViewImpl& impl = static_cast<ImageViewImpl&>(view.GetImplementation());
+    ImageViewImpl& impl = static_cast<ImageViewImpl&>(GetImpl(view));
     switch(index)
     {
       case Property::IMAGE:
@@ -315,10 +333,10 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
 Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali::Property::Index index)
 {
   Dali::Property::Value value;
-  Ui::ImageView         view = Ui::ImageView::DownCast(Dali::BaseHandle(object));
+  Ui::View              view = Ui::View::DownCast(Dali::BaseHandle(object));
   if(view)
   {
-    ImageViewImpl& impl = static_cast<ImageViewImpl&>(view.GetImplementation());
+    ImageViewImpl& impl = static_cast<ImageViewImpl&>(GetImpl(view));
     switch(index)
     {
       case Property::IMAGE:
@@ -759,24 +777,13 @@ Ui::Visual::ResourceStatus ImageViewImpl::GetLoadingStatus() const
   return Ui::Visual::ResourceStatus::PREPARING;
 }
 
-Ui::ImageView::ImageViewSignal& ImageViewImpl::ResourceReadySignal()
-{
-  return mResourceReadySignal;
-}
-
-Ui::ImageView::ImageViewSignal& ImageViewImpl::ResourceLoadedSignal()
-{
-  return mResourceLoadedSignal;
-}
-
 void ImageViewImpl::OnInitialize()
 {
   ViewImpl::OnInitialize();
   mDepthIndex = DepthIndex::CONTENT;
 
-  // Bridge View::ResourceReadySignal → ImageView::ResourceReadySignal
-  // View::ResourceReadySignal is emitted by ViewDataImpl when the visual becomes ready.
-  // ImageView::ResourceReadySignal is the per-type signal expected by callers using the ImageView handle.
+  // Connect to View::ResourceReadySignal to handle placeholder removal and AdjustViewSize
+  // when the main image visual becomes ready.
   Ui::View::DownCast(Self()).ResourceReadySignal().Connect(this, &ImageViewImpl::OnViewResourceReady);
 }
 
@@ -785,13 +792,22 @@ void ImageViewImpl::UpdatePlaceholderVisual()
   auto& viewData = Internal::ViewDataImpl::Get(*this);
   viewData.UnregisterVisual(ImageViewImpl::Property::PLACEHOLDER_IMAGE);
 
-  if(mPlaceholderImageUrl.Empty()) return;
+  if(mPlaceholderImageUrl.Empty())
+  {
+    return;
+  }
 
   // Don't show placeholder if main image is already loaded
-  if(viewData.GetVisualResourceStatus(ImageViewImpl::Property::IMAGE) == Ui::Visual::ResourceStatus::READY) return;
+  if(viewData.GetVisualResourceStatus(ImageViewImpl::Property::IMAGE) == Ui::Visual::ResourceStatus::READY)
+  {
+    return;
+  }
 
   auto visualFactory = Ui::VisualFactory::Get();
-  if(!visualFactory) return;
+  if(!visualFactory)
+  {
+    return;
+  }
 
   Dali::Property::Map map;
   map.Insert(Visual::Property::TYPE, Visual::IMAGE);
@@ -820,15 +836,6 @@ void ImageViewImpl::OnViewResourceReady(Ui::View view)
   if(mAdjustViewSize)
   {
     InvalidateMeasure();
-  }
-
-  Ui::ImageView self = Ui::ImageView::DownCast(view);
-  if(self)
-  {
-    mResourceReadySignal.Emit(self);
-    // TODO: ResourceLoadedSignal currently fires at the same time as ResourceReadySignal.
-    // Consider consolidating into a single signal in a future cleanup.
-    mResourceLoadedSignal.Emit(self);
   }
 }
 

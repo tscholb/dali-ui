@@ -106,11 +106,12 @@ private:
       });
   }
 
-  void OnResourceReady(ImageView view)
+  void OnResourceReady(View view)
   {
+    ImageView imageView = ImageView::DownCast(view);
     DALI_LOG_RELEASE_INFO("[ImageView] ResourceReadySignal fired. url=%s status=%d\n",
-                          view.GetUrl().CStr(),
-                          static_cast<int>(view.GetLoadingStatus()));
+                          imageView.GetUrl().CStr(),
+                          static_cast<int>(imageView.GetLoadingStatus()));
   }
 
   void OnKeyEvent(const KeyEvent& event)

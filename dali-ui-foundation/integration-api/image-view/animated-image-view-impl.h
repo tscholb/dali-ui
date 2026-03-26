@@ -18,7 +18,6 @@
  */
 
 #include <dali-ui-foundation/integration-api/view-impl.h>
-#include <dali-ui-foundation/public-api/image-view/animated-image-view.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/vector4.h>
@@ -30,6 +29,9 @@ namespace Ui
 {
 namespace Integration
 {
+
+class AnimatedImageViewImpl;
+using AnimatedImageViewImplPtr = IntrusivePtr<AnimatedImageViewImpl>;
 
 /**
  * @brief This is the internal implementation class for AnimatedImageView.
@@ -73,11 +75,11 @@ protected: // Construction & Destruction
 
 public: // Creation
   /**
-   * @brief Creates a new AnimatedImageView.
+   * @brief Creates a new AnimatedImageViewImpl.
    *
-   * @return A handle to the newly allocated AnimatedImageView
+   * @return An intrusive pointer to the newly allocated AnimatedImageViewImpl
    */
-  static Ui::AnimatedImageView New();
+  static AnimatedImageViewImplPtr New();
 
 public: // Properties (required by DALI_PROPERTY_REGISTRATION)
   /// @cond internal
@@ -131,21 +133,11 @@ public: // API
    */
   UiColor GetImageColor() const;
 
-public: // Loading Status & Signals
+public: // Loading Status
   /**
    * @copydoc Dali::Ui::AnimatedImageView::GetLoadingStatus
    */
   Ui::Visual::ResourceStatus GetLoadingStatus() const;
-
-  /**
-   * @copydoc Dali::Ui::AnimatedImageView::ResourceReadySignal
-   */
-  Ui::AnimatedImageView::ImageViewSignal& ResourceReadySignal();
-
-  /**
-   * @copydoc Dali::Ui::AnimatedImageView::ResourceLoadedSignal
-   */
-  Ui::AnimatedImageView::ImageViewSignal& ResourceLoadedSignal();
 
 private: // From ViewImpl
   /**
@@ -172,26 +164,11 @@ private:
   AnimatedImageViewImpl& operator=(AnimatedImageViewImpl&&)      = delete;
 
 private: // Data
-  Dali::String                           mUrl;
-  int                                    mLoopCount;
-  UiColor                                mImageColor;
-  Ui::AnimatedImageView::ImageViewSignal mResourceReadySignal;
-  Ui::AnimatedImageView::ImageViewSignal mResourceLoadedSignal;
+  Dali::String mUrl;
+  int          mLoopCount;
+  UiColor      mImageColor;
 };
 
 } // namespace Integration
-
-inline Integration::AnimatedImageViewImpl& GetImpl(Ui::AnimatedImageView& obj)
-{
-  DALI_ASSERT_ALWAYS(obj);
-  return static_cast<Integration::AnimatedImageViewImpl&>(obj.GetImplementation());
-}
-
-inline const Integration::AnimatedImageViewImpl& GetImpl(const Ui::AnimatedImageView& obj)
-{
-  DALI_ASSERT_ALWAYS(obj);
-  return static_cast<const Integration::AnimatedImageViewImpl&>(obj.GetImplementation());
-}
-
 } // namespace Ui
 } // namespace Dali

@@ -20,7 +20,6 @@
 #include <dali-ui-foundation/devel-api/visual-factory/visual-base.h>
 #include <dali-ui-foundation/integration-api/view-impl.h>
 #include <dali-ui-foundation/public-api/image-view/image-view-types.h>
-#include <dali-ui-foundation/public-api/image-view/image-view.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/common/dali-string.h>
@@ -34,6 +33,9 @@ namespace Ui
 {
 namespace Integration
 {
+
+class ImageViewImpl;
+using ImageViewImplPtr = IntrusivePtr<ImageViewImpl>;
 
 /**
  * @brief This is the internal implementation class for ImageView.
@@ -211,11 +213,11 @@ protected: // Construction & Destruction
 
 public: // Creation
   /**
-   * @brief Creates a new ImageView.
+   * @brief Creates a new ImageViewImpl.
    *
-   * @return A handle to the newly allocated ImageView
+   * @return An intrusive pointer to the newly allocated ImageViewImpl
    */
-  static Ui::ImageView New();
+  static ImageViewImplPtr New();
 
 public: // Properties (required by DALI_PROPERTY_REGISTRATION)
   /// @cond internal
@@ -443,29 +445,17 @@ public: // API — N-Patch Border
    */
   bool GetBorderOnly() const;
 
-public: // Internal helpers
+public: // Depth Index
   /**
-   * @brief Sets the depth index of the image visual.
-   *
-   * @param[in] depthIndex The depth index to assign to the registered visual
+   * @copydoc Dali::Ui::ImageView::SetDepthIndex
    */
   void SetDepthIndex(int depthIndex);
 
-public: // Loading Status & Signals
+public: // Loading Status
   /**
    * @copydoc Dali::Ui::ImageView::GetLoadingStatus
    */
   Ui::Visual::ResourceStatus GetLoadingStatus() const;
-
-  /**
-   * @copydoc Dali::Ui::ImageView::ResourceReadySignal
-   */
-  Ui::ImageView::ImageViewSignal& ResourceReadySignal();
-
-  /**
-   * @copydoc Dali::Ui::ImageView::ResourceLoadedSignal
-   */
-  Ui::ImageView::ImageViewSignal& ResourceLoadedSignal();
 
 private: // From ViewImpl
   /**
@@ -540,25 +530,9 @@ private: // Data
   int                      mDepthIndex;
   bool                     mVisualDirty;
 
-  Ui::ImageView::ImageViewSignal mResourceReadySignal;
-  Ui::ImageView::ImageViewSignal mResourceLoadedSignal;
-
   Ui::Visual::Base mVisual;
 };
 
 } // namespace Integration
-
-inline Integration::ImageViewImpl& GetImpl(Ui::ImageView& obj)
-{
-  DALI_ASSERT_ALWAYS(obj);
-  return static_cast<Integration::ImageViewImpl&>(obj.GetImplementation());
-}
-
-inline const Integration::ImageViewImpl& GetImpl(const Ui::ImageView& obj)
-{
-  DALI_ASSERT_ALWAYS(obj);
-  return static_cast<const Integration::ImageViewImpl&>(obj.GetImplementation());
-}
-
 } // namespace Ui
 } // namespace Dali

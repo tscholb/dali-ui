@@ -33,7 +33,6 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
 // INTERNAL INCLUDES
-#include <dali-ui-foundation/integration-api/image-view/image-view-impl.h>
 #include <dali-ui-foundation/internal/graphics/builtin-shader-extern-gen.h>
 #include <dali-ui-foundation/public-api/controls/control-depth-index-ranges.h>
 #include <dali-ui-foundation/public-api/image-view/image-view.h>
@@ -817,7 +816,7 @@ struct Decorator::Impl : public ConnectionTracker
       if(mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED].size())
       {
         grabHandle.actor = ImageView::New(ToDaliString(mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED]));
-        GetImpl(grabHandle.actor).SetDepthIndex(DepthIndex::DECORATION);
+        grabHandle.actor.SetDepthIndex(DepthIndex::DECORATION);
         grabHandle.actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
         grabHandle.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
 
@@ -906,7 +905,7 @@ struct Decorator::Impl : public ConnectionTracker
           Actor::Property::ANCHOR_POINT,
           AnchorPoint::TOP_RIGHT); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
         primary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
-        GetImpl(primary.actor).SetDepthIndex(DepthIndex::DECORATION);
+        primary.actor.SetDepthIndex(DepthIndex::DECORATION);
         primary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
 
         primary.grabArea =
@@ -955,7 +954,7 @@ struct Decorator::Impl : public ConnectionTracker
           Actor::Property::ANCHOR_POINT,
           AnchorPoint::TOP_LEFT); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
         secondary.actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
-        GetImpl(secondary.actor).SetDepthIndex(DepthIndex::DECORATION);
+        secondary.actor.SetDepthIndex(DepthIndex::DECORATION);
         secondary.actor.SetProperty(Actor::Property::COLOR, mHandleColor);
 
         secondary.grabArea =

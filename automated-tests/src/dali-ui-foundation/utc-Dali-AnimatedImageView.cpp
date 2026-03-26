@@ -232,15 +232,14 @@ int UtcDaliAnimatedImageViewGetLoadingStatusP(void)
   END_TEST;
 }
 
-// ResourceReadySignal / ResourceLoadedSignal
+// ResourceReadySignal
 
 int UtcDaliAnimatedImageViewSignalsP(void)
 {
   TestApplication application;
   AnimatedImageView view = AnimatedImageView::New();
-  // Signals should be accessible without crash — just call, don't store
+  // ResourceReadySignal is inherited from View — just call, don't store
   view.ResourceReadySignal();
-  view.ResourceLoadedSignal();
   DALI_TEST_CHECK(true);
   END_TEST;
 }

@@ -1,13 +1,34 @@
+/*
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+// CLASS HEADER
 #include "animated-image-view-impl.h"
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
+
+// INTERNAL INCLUDES
 #include <dali-ui-foundation/devel-api/visual-factory/visual-factory.h>
 #include <dali-ui-foundation/devel-api/visuals/animated-image-visual-actions-devel.h>
 #include <dali-ui-foundation/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-ui-foundation/internal/views/view/view-data-impl.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
 #include <dali-ui-foundation/public-api/visuals/visual-properties.h>
-#include <dali/devel-api/object/type-registry-helper.h>
-#include <dali/devel-api/object/type-registry.h>
-#include <dali/public-api/object/base-handle.h>
 
 namespace Dali
 {
@@ -15,11 +36,15 @@ namespace Ui
 {
 namespace Integration
 {
+
 namespace
 {
 BaseHandle Create()
 {
-  return AnimatedImageView::New();
+  AnimatedImageViewImplPtr impl = AnimatedImageViewImpl::New();
+  Ui::View                 view(*impl);
+  impl->Initialize();
+  return view;
 }
 // clang-format off
 DALI_TYPE_REGISTRATION_BEGIN(AnimatedImageViewImpl, ViewImpl, Create)
@@ -28,7 +53,6 @@ DALI_PROPERTY_REGISTRATION(Ui::Integration, AnimatedImageViewImpl, "image", STRI
 
 DALI_TYPE_REGISTRATION_END()
 // clang-format on
-
 } // namespace
 
 AnimatedImageViewImpl::AnimatedImageViewImpl()
@@ -48,20 +72,17 @@ Dali::String AnimatedImageViewImpl::GetUrl() const
   return mUrl;
 }
 
-Ui::AnimatedImageView AnimatedImageViewImpl::New()
+AnimatedImageViewImplPtr AnimatedImageViewImpl::New()
 {
-  IntrusivePtr<AnimatedImageViewImpl> impl = new AnimatedImageViewImpl();
-  Ui::AnimatedImageView               handle(*impl);
-  impl->Initialize();
-  return handle;
+  return new AnimatedImageViewImpl();
 }
 
 void AnimatedImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value)
 {
-  Ui::AnimatedImageView view = Ui::AnimatedImageView::DownCast(Dali::BaseHandle(object));
+  Ui::View view = Ui::View::DownCast(Dali::BaseHandle(object));
   if(view)
   {
-    AnimatedImageViewImpl& impl = static_cast<AnimatedImageViewImpl&>(view.GetImplementation());
+    AnimatedImageViewImpl& impl = static_cast<AnimatedImageViewImpl&>(GetImpl(view));
     switch(index)
     {
       case AnimatedImageViewImpl::Property::IMAGE:
@@ -80,10 +101,10 @@ void AnimatedImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property
 Dali::Property::Value AnimatedImageViewImpl::GetProperty(Dali::BaseObject* object, Dali::Property::Index index)
 {
   Dali::Property::Value value;
-  Ui::AnimatedImageView view = Ui::AnimatedImageView::DownCast(Dali::BaseHandle(object));
+  Ui::View              view = Ui::View::DownCast(Dali::BaseHandle(object));
   if(view)
   {
-    AnimatedImageViewImpl& impl = static_cast<AnimatedImageViewImpl&>(view.GetImplementation());
+    AnimatedImageViewImpl& impl = static_cast<AnimatedImageViewImpl&>(GetImpl(view));
     switch(index)
     {
       case AnimatedImageViewImpl::Property::IMAGE:
@@ -176,25 +197,14 @@ Ui::Visual::ResourceStatus AnimatedImageViewImpl::GetLoadingStatus() const
   return Internal::ViewDataImpl::Get(*this).GetVisualResourceStatus(AnimatedImageViewImpl::Property::IMAGE);
 }
 
-Ui::AnimatedImageView::ImageViewSignal& AnimatedImageViewImpl::ResourceReadySignal()
-{
-  return mResourceReadySignal;
-}
-
-Ui::AnimatedImageView::ImageViewSignal& AnimatedImageViewImpl::ResourceLoadedSignal()
-{
-  return mResourceLoadedSignal;
-}
-
-// TODO: ResourceReadySignal and ResourceLoadedSignal are never emitted.
-// Connect to View::ResourceReadySignal in OnInitialize() and emit them,
-// similar to ImageViewImpl::OnViewResourceReady.
-
 void AnimatedImageViewImpl::UpdateVisual()
 {
   auto& viewData = Internal::ViewDataImpl::Get(*this);
   viewData.UnregisterVisual(AnimatedImageViewImpl::Property::IMAGE);
-  if(mUrl.Empty()) return;
+  if(mUrl.Empty())
+  {
+    return;
+  }
 
   Dali::Property::Map map;
   map.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);

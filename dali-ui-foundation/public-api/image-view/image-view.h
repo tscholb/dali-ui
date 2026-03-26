@@ -53,8 +53,6 @@ class ImageViewImpl;
 class DALI_UI_API ImageView : public View
 {
 public:
-  using ImageViewSignal = Signal<void(ImageView)>;
-
 public: // Creation & Destruction
   /**
    * @brief Creates an uninitialized ImageView handle.
@@ -485,6 +483,18 @@ public: // N-Patch Border
    */
   bool GetBorderOnly() const;
 
+public: // Depth Index
+  /**
+   * @brief Sets the depth index of the image visual.
+   *
+   * The depth index controls the rendering order of visuals within the same
+   * layer. Higher values are rendered on top.
+   *
+   * @param[in] depthIndex The depth index to assign to the image visual
+   * @return Reference to this for fluent chaining
+   */
+  ImageView& SetDepthIndex(int depthIndex);
+
 public: // Loading Status & Signals
   /**
    * @brief Gets the current loading status of the image.
@@ -498,14 +508,7 @@ public: // Loading Status & Signals
    *
    * @return A reference to the ResourceReady signal
    */
-  ImageViewSignal& ResourceReadySignal();
-
-  /**
-   * @brief Returns the signal emitted when the image resource has been loaded.
-   *
-   * @return A reference to the ResourceLoaded signal
-   */
-  ImageViewSignal& ResourceLoadedSignal();
+  ResourceReadySignalType& ResourceReadySignal();
 
 public: // Not intended for application developers
   /// @cond internal

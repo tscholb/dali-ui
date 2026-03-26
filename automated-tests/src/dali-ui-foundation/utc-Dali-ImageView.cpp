@@ -456,8 +456,8 @@ int UtcDaliImageViewSignalsP(void)
 {
   TestApplication application;
   ImageView view = ImageView::New();
+  // ResourceReadySignal is inherited from View — just call, don't store
   view.ResourceReadySignal();
-  view.ResourceLoadedSignal();
   DALI_TEST_CHECK(true);
   END_TEST;
 }
