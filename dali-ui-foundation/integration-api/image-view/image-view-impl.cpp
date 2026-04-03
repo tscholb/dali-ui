@@ -68,6 +68,7 @@ DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "synchronousSizing", 
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "alphaMaskUrl", STRING, ALPHA_MASK_URL)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "cropToMask", BOOLEAN, CROP_TO_MASK)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "maskingMode", INTEGER, MASKING_MODE)
+DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "loadPolicy", INTEGER, LOAD_POLICY)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "releasePolicy", INTEGER, RELEASE_POLICY)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "synchronousLoading", BOOLEAN, SYNCHRONOUS_LOADING)
 DALI_PROPERTY_REGISTRATION(Ui::Integration, ImageViewImpl, "fastTrackUploading", BOOLEAN, FAST_TRACK_UPLOADING)
@@ -92,6 +93,7 @@ ImageViewImpl::ImageViewImpl()
   mSamplingMode(Ui::SamplingMode::BOX_THEN_LINEAR),
   mFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO),
   mMaskingMode(Ui::MaskingType::MASKING_ON_RENDERING),
+  mLoadPolicy(Ui::LoadPolicy::ATTACHED),
   mReleasePolicy(Ui::ReleasePolicy::DETACHED),
   mDesiredSize(),
   mDepthIndex(0),
@@ -232,6 +234,15 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         }
         break;
       }
+      case Property::LOAD_POLICY:
+      {
+        int policy;
+        if(value.Get(policy))
+        {
+          impl.SetLoadPolicy(static_cast<Ui::LoadPolicy::Type>(policy));
+        }
+        break;
+      }
       case Property::RELEASE_POLICY:
       {
         int policy;
@@ -352,6 +363,9 @@ Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali:
         break;
       case Property::MASKING_MODE:
         value = static_cast<int>(impl.GetMaskingMode());
+        break;
+      case Property::LOAD_POLICY:
+        value = static_cast<int>(impl.GetLoadPolicy());
         break;
       case Property::RELEASE_POLICY:
         value = static_cast<int>(impl.GetReleasePolicy());
@@ -593,6 +607,21 @@ UiColor ImageViewImpl::GetImageColor() const
   return mImageColor;
 }
 
+void ImageViewImpl::SetLoadPolicy(Ui::LoadPolicy::Type loadPolicy)
+{
+  if(mLoadPolicy != loadPolicy)
+  {
+    mLoadPolicy  = loadPolicy;
+    mVisualDirty = true;
+    InvalidateMeasure();
+  }
+}
+
+Ui::LoadPolicy::Type ImageViewImpl::GetLoadPolicy() const
+{
+  return mLoadPolicy;
+}
+
 void ImageViewImpl::SetReleasePolicy(Ui::ReleasePolicy::Type releasePolicy)
 {
   if(mReleasePolicy != releasePolicy)
@@ -724,7 +753,7 @@ void ImageViewImpl::OnInitialize()
   ViewImpl::OnInitialize();
   mDepthIndex = DepthIndex::CONTENT;
 
-  // Connect to View::ResourceReadySignal to handle placeholder removal and AdjustViewSize
+  // Connect to View::ResourceReadySignal to handle placeholder removal and FitSizeToImage
   // when the main image visual becomes ready.
   Ui::View::DownCast(Self()).ResourceReadySignal().Connect(this, &ImageViewImpl::OnViewResourceReady);
 }
@@ -774,7 +803,7 @@ void ImageViewImpl::OnViewResourceReady(Ui::View view)
   // Main image is ready: remove placeholder
   viewData.UnregisterVisual(ImageViewImpl::Property::PLACEHOLDER_IMAGE);
 
-  // If AdjustViewSize is enabled, request a re-layout now that the natural size is known
+  // If FitSizeToImage is enabled, request a re-layout now that the natural size is known
   if(mFitSizeToImage)
   {
     InvalidateMeasure();
@@ -884,6 +913,7 @@ void ImageViewImpl::UpdateVisual()
       map.Insert(Ui::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mDesiredSize.GetHeight()));
     }
 
+    map.Insert(Ui::ImageVisual::Property::LOAD_POLICY, static_cast<int>(mLoadPolicy));
     map.Insert(Ui::ImageVisual::Property::RELEASE_POLICY, static_cast<int>(mReleasePolicy));
     map.Insert(Ui::ImageVisual::Property::SYNCHRONOUS_LOADING, mSynchronousLoading);
     map.Insert(Ui::DevelImageVisual::Property::FAST_TRACK_UPLOADING, mFastTrackUploading);

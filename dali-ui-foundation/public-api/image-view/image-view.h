@@ -371,6 +371,24 @@ public: // Advanced Rendering & Masking
 
 public: // Loading Behavior
   /**
+   * @brief Sets the load policy for the image resource.
+   *
+   * Determines whether the image is loaded immediately when the view is created (IMMEDIATE),
+   * or deferred until the view is attached to the scene (ATTACHED).
+   *
+   * @param[in] loadPolicy The load policy to use
+   * @return Reference to this for fluent chaining
+   */
+  ImageView& SetLoadPolicy(Ui::LoadPolicy::Type loadPolicy);
+
+  /**
+   * @brief Gets the load policy.
+   *
+   * @return The current load policy
+   */
+  Ui::LoadPolicy::Type GetLoadPolicy() const;
+
+  /**
    * @brief Sets the release policy for the image resource.
    *
    * Controls when the image texture is released from memory.

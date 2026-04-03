@@ -167,6 +167,17 @@ bool ImageView::GetCropToMask() const
   return Ui::GetImpl(*this).GetCropToMask();
 }
 
+ImageView& ImageView::SetLoadPolicy(Ui::LoadPolicy::Type loadPolicy)
+{
+  Ui::GetImpl(*this).SetLoadPolicy(loadPolicy);
+  return *this;
+}
+
+Ui::LoadPolicy::Type ImageView::GetLoadPolicy() const
+{
+  return Ui::GetImpl(*this).GetLoadPolicy();
+}
+
 ImageView& ImageView::SetReleasePolicy(Ui::ReleasePolicy::Type releasePolicy)
 {
   Ui::GetImpl(*this).SetReleasePolicy(releasePolicy);

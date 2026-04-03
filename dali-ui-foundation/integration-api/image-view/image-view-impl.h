@@ -135,6 +135,12 @@ public: // Properties
       MASKING_MODE,
 
       /**
+       * @brief The load policy for the image resource.
+       * @details Name "loadPolicy", type Property::INTEGER.
+       */
+      LOAD_POLICY,
+
+      /**
        * @brief The release policy for the image resource.
        * @details Name "releasePolicy", type Property::INTEGER.
        */
@@ -353,6 +359,16 @@ public: // API — Advanced Rendering & Masking
 
 public: // API — Loading Behavior
   /**
+   * @copydoc Dali::Ui::ImageView::SetLoadPolicy
+   */
+  void SetLoadPolicy(Ui::LoadPolicy::Type loadPolicy);
+
+  /**
+   * @copydoc Dali::Ui::ImageView::GetLoadPolicy
+   */
+  Ui::LoadPolicy::Type GetLoadPolicy() const;
+
+  /**
    * @copydoc Dali::Ui::ImageView::SetReleasePolicy
    */
   void SetReleasePolicy(Ui::ReleasePolicy::Type releasePolicy);
@@ -488,6 +504,7 @@ private: // Data
   Ui::SamplingMode::Type  mSamplingMode;
   Ui::FittingMode::Type   mFittingMode;
   Ui::MaskingType::Type   mMaskingMode;
+  Ui::LoadPolicy::Type    mLoadPolicy;
   Ui::ReleasePolicy::Type mReleasePolicy;
   Ui::ImageDimensions     mDesiredSize;
 
