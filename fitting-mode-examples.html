@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dali-UI ImageView FittingMode 파헤치기</title>
+    <style>
+        body { background-color: #f7f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px; color: #333; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-weight: 800; font-size: 2.5em; }
+        .subtitle { text-align: center; color: #7f8c8d; font-size: 1.1em; margin-bottom: 50px; line-height: 1.6; }
+        
+        .original { text-align: center; margin-bottom: 60px; padding: 30px; background: #e8f4fd; border-radius: 12px; }
+        .original img { width: 300px; height: 200px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 15px; }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 60px 100px; padding: 0 20px; }
+        .card { background: #fff; border: none; }
+        .card h3 { color: #e74c3c; margin-top: 0; font-size: 1.4em; border-bottom: 2px solid #fce8e6; padding-bottom: 10px; margin-bottom: 40px; }
+        
+        .demo-wrapper {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px auto;
+        }
+
+        .view-bounds {
+            position: absolute;
+            left: 0; top: 0;
+            width: 400px; height: 400px;
+            border: 4px dashed #e74c3c;
+            border-radius: 8px;
+            background-color: #ecf0f1;
+            overflow: hidden; /* 영역 밖으로 삐져나가는 부분을 가려버림 */
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* 라벨 디자인 */
+        .view-bounds::after {
+            content: "800x800 View 영역";
+            position: absolute;
+            top: 5px; left: 10px;
+            font-size: 0.85em;
+            color: #fff;
+            background: rgba(231, 76, 60, 0.95);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .real-img {
+            position: absolute;
+            z-index: 1;
+            box-shadow: 0 0 1px rgba(0,0,0,0.1);
+        }
+
+        /* 화면 밖으로 잘려나간(Cropped) 영역 시각화 */
+        .ghost-img {
+            position: absolute;
+            z-index: 0;
+            filter: brightness(0.4) grayscale(60%) blur(1px); /* 잘려나간 영역을 어둡고 흐리게 표현 */
+            border-radius: 8px;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .ghost-label {
+            position: absolute;
+            z-index: 0;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        ul { line-height: 1.6; color: #505050; padding-left: 20px; font-size: 15px; margin-top: 25px; }
+        li { margin-bottom: 8px; }
+        li strong { color: #2c3e50; }
+        .highlight { background: #ffeaa7; padding: 0 4px; border-radius: 3px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ImageView FittingMode 직관적 이해 가이드</h1>
+    <p class="subtitle">
+        이미지 크기가 <b>600x400</b> 이고, UI View 컴포넌트의 크기가 <b>800x800</b> (View가 이미지보다 훨씬 큰) 상황을 가정했습니다.<br>
+        (웹페이지 비례에 맞게 절반 스케일로 축소하여 시각화 되었습니다)
+    </p>
+
+    <div class="original">
+        <h3>[ 원본 소스 이미지 : 600x400 해상도 ]</h3>
+        <!-- 소스 이미지는 300x200으로 보여줌 (실제 크기의 1/2) -->
+        <img src="./sample_landscape.png" alt="원본 이미지 600x400">
+    </div>
+
+    <div class="grid">
+        
+        <!-- 1. FIT_KEEP_ASPECT_RATIO -->
+        <div class="card">
+            <h3>1. FIT_KEEP_ASPECT_RATIO</h3>
+            <div class="demo-wrapper">
+                <!-- 이미지 원본의 비율을 유지하며 400x400 영역에 핏팅. 
+                     가로가 한계점(400)에 닿을 때 높이는 266.6 가 됨. 위치는 세로 중앙정렬. -->
+                <img src="./sample_landscape.png" class="ghost-img" style="width: 400px; height: 266.6px; left: 0px; top: 66.7px;">
+                <div class="view-bounds">
+                    <img src="./sample_landscape.png" class="real-img" style="width: 400px; height: 266.6px; left: 0px; top: 66.7px;" alt="FIT_KEEP_ASPECT_RATIO">
+                </div>
+            </div>
+            <ul>
+                <li><strong>비율 유지:</strong> O</li>
+                <li><strong>잘림(Crop):</strong> X <span style="font-size: 0.9em; color:#888;">(어두워진 영역 없음)</span></li>
+                <li><strong>현상:</strong> 이미지 전체가 다 보이도록 영역 내부에 맞춰 확대됩니다. 위아래로 레터박스(빈 회색 공간)가 발생합니다.</li>
+            </ul>
+        </div>
+
+        <!-- 2. FILL -->
+        <div class="card">
+            <h3>2. FILL</h3>
+            <div class="demo-wrapper">
+                <!-- 이미지 비율을 무시하고 400x400 가득 채움 -->
+                <img src="./sample_landscape.png" class="ghost-img" style="width: 400px; height: 400px; left: 0px; top: 0px;">
+                <div class="view-bounds">
+                    <img src="./sample_landscape.png" class="real-img" style="width: 400px; height: 400px; left: 0px; top: 0px;" alt="FILL">
+                </div>
+            </div>
+            <ul>
+                <li><strong>비율 유지:</strong> X</li>
+                <li><strong>잘림(Crop):</strong> X</li>
+                <li><strong>현상:</strong> 비율을 포기하고 빈 공간이 없도록 가로/세로를 100% 억지로 늘려서 채웁니다. <span class="highlight">이미지가 왜곡(찌그러짐)됩니다.</span></li>
+            </ul>
+        </div>
+
+        <!-- 3. OVER_FIT_KEEP_ASPECT_RATIO -->
+        <div class="card">
+            <h3>3. OVER_FIT_KEEP_ASPECT_RATIO</h3>
+            <div class="demo-wrapper">
+                <!-- 영역을 메꾸려면 세로(200)를 400까지 늘려야 하므로, 2배로 커짐. 
+                     그 결과 이미지는 600x400이 되고, 좌측 -100px로 이동함. -->
+                <img src="./sample_landscape.png" class="ghost-img" style="width: 600px; height: 400px; left: -100px; top: 0px;">
+                <div class="ghost-label" style="left: -80px; top: 190px;">Cropped</div>
+                <div class="ghost-label" style="right: -80px; top: 190px;">Cropped</div>
+                
+                <div class="view-bounds">
+                    <img src="./sample_landscape.png" class="real-img" style="width: 600px; height: 400px; left: -100px; top: 0px;" alt="OVER_FIT_KEEP_ASPECT_RATIO">
+                </div>
+            </div>
+            <ul>
+                <li><strong>비율 유지:</strong> O</li>
+                <li><strong>잘림(Crop):</strong> O</li>
+                <li><strong>현상:</strong> 비율을 보존한 채로 영역의 구멍이 안 보이게 꽉 채울 때까지 확대합니다. <span class="highlight">크기가 커져서 영역 밖으로 삐져나가는 좌/우 테두리(어두운 부분)는 완전히 잘려나갑니다.</span></li>
+            </ul>
+        </div>
+
+        <!-- 4. CENTER -->
+        <div class="card">
+            <h3>4. CENTER</h3>
+            <div class="demo-wrapper">
+                <!-- 이미지 원본 크기(300x200) 유지, 400x400 뷰 중앙에 배치. 
+                     왼쪽 50px, 위 100px 띄움 -->
+                <img src="./sample_landscape.png" class="ghost-img" style="width: 300px; height: 200px; left: 50px; top: 100px;">
+                <div class="view-bounds">
+                    <img src="./sample_landscape.png" class="real-img" style="width: 300px; height: 200px; left: 50px; top: 100px;" alt="CENTER">
+                </div>
+            </div>
+            <ul>
+                <li><strong>비율 유지:</strong> O (크기 완전 고정)</li>
+                <li><strong>잘림(Crop):</strong> X (이 경우 뷰보다 작으므로)</li>
+                <li><strong>현상:</strong> 이미지의 원본 해상도 (600x400) 그대로 화면 (800x800)의 정중앙에 올려둡니다. <span class="highlight">View가 더 크기 때문에 단 하나도 잘려나가지 않고 중앙에 예쁘게 안착</span>하며 사방에 빈 공간이 남습니다.</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
