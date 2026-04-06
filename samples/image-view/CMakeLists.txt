@@ -61,3 +61,6 @@ add_image_view_sample(image-view-image-color.example image-view-image-color-exam
 add_image_view_sample(image-view-sampling-desired-size.example image-view-sampling-desired-size-example.cpp)
 add_image_view_sample(image-view-sizing.example image-view-sizing-example.cpp)
 add_image_view_sample(image-view-loading-policy.example image-view-loading-policy-example.cpp)
+
+add_image_view_sample(animated-image-view.example animated-image-view-example.cpp)
+add_image_view_sample(lottie-animation-view.example lottie-animation-view-example.cpp)
