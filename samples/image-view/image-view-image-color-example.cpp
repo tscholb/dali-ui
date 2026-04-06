@@ -15,6 +15,8 @@
 
 #include <dali-ui-foundation/dali-ui-foundation.h>
 #include <dali-ui-foundation/public-api/image-view/image-view.h>
+#include <dali-ui-foundation/public-api/image-view/animated-image-view.h>
+#include <dali-ui-foundation/public-api/image-view/lottie-animation-view.h>
 #include <dali-ui-foundation/public-api/layouts/stack-layout-params.h>
 #include <dali-ui-foundation/public-api/layouts/stack-layout.h>
 #include <dali/integration-api/debug.h>
@@ -23,16 +25,18 @@ using namespace Dali;
 using namespace Dali::Ui;
 
 /**
- * ImageView ImageColor sample:
+ * ImageColor sample for ImageView / AnimatedImageView / LottieAnimationView:
  * - SetImageColor() applies an RGBA color as a per-pixel multiplier on the image
  * - WHITE (0xFFFFFF) means no tint — the image appears as original
  * - Preset buttons demonstrate: no tint, red/green/blue channels, desaturate (gray), dim
  * - Alpha column shows partial transparency via the alpha component
+ * - IMAGE TYPE button switches between ImageView, AnimatedImageView (GIF), and LottieAnimationView
  * - Press Escape or Back to quit
  */
-class ImageViewImageColorController : public ConnectionTracker
+class ImageColorController : public ConnectionTracker
 {
   static constexpr int COLOR_COUNT = 6;
+  static constexpr int IMAGE_TYPE_COUNT = 3;
 
   struct ColorEntry
   {
@@ -41,13 +45,16 @@ class ImageViewImageColorController : public ConnectionTracker
   };
 
   static const ColorEntry COLORS[COLOR_COUNT];
+  static const char*      IMAGE_TYPE_NAMES[IMAGE_TYPE_COUNT];
+  static const char*      IMAGE_URLS[IMAGE_TYPE_COUNT];
 
 public:
-  explicit ImageViewImageColorController(Application& application)
+  explicit ImageColorController(Application& application)
   : mApplication(application),
-    mColorIndex(0)
+    mColorIndex(0),
+    mImageTypeIndex(0)
   {
-    mApplication.InitSignal().Connect(this, &ImageViewImageColorController::OnInit);
+    mApplication.InitSignal().Connect(this, &ImageColorController::OnInit);
   }
 
 private:
@@ -58,7 +65,7 @@ private:
 
     window.Add(CreateContents());
 
-    window.KeyEventSignal().Connect(this, &ImageViewImageColorController::OnKeyEvent);
+    window.KeyEventSignal().Connect(this, &ImageColorController::OnKeyEvent);
   }
 
   View CreateContents()
@@ -67,21 +74,97 @@ private:
       .SetRequestedWidth(MATCH_PARENT)
       .SetRequestedHeight(MATCH_PARENT)
       .Children({
+        CreateImageTypeRow(),
         CreateImageArea(),
         CreateInfoLabel(),
         CreateColorButtonRow(),
       });
   }
 
+  View CreateImageTypeRow()
+  {
+    StackLayout row = StackLayout::New(StackOrientation::HORIZONTAL)
+                        .Spacing(4.0f)
+                        .SetRequestedWidth(MATCH_PARENT)
+                        .SetRequestedHeight(44.0f)
+                        .SetViewPadding(Extents(4, 4, 4, 4));
+
+    StackLayout typeButton = StackLayout::New(StackOrientation::VERTICAL)
+                               .SetRequestedWidth(MATCH_PARENT)
+                               .SetRequestedHeight(MATCH_PARENT)
+                               .SetBackgroundColor(UiColor(0x1565C0))
+                               .Children({
+                                 Label::New(IMAGE_TYPE_NAMES[mImageTypeIndex])
+                                   .SetRequestedWidth(MATCH_PARENT)
+                                   .SetRequestedHeight(MATCH_PARENT)
+                                   .SetFontSize(13.0f)
+                                   .SetTextColor(UiColor(0xFFFFFF))
+                                   .SetHorizontalTextAlignment(Text::Alignment::CENTER)
+                                   .SetVerticalTextAlignment(Text::Alignment::CENTER)
+                                   .As(mImageTypeLabel),
+                               });
+    typeButton.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageColorController::OnImageTypeClicked);
+    mImageTypeButton = typeButton;
+
+    row.Add(typeButton);
+    return row;
+  }
+
   View CreateImageArea()
   {
-    return ImageView::New(RESOURCES_DIR "gallery-large-3.jpg")
-      .SetRequestedWidth(MATCH_PARENT)
-      .SetRequestedHeight(WRAP_CONTENT)
-      .SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO)
-      .SetImageColor(COLORS[mColorIndex].color)
-      .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f))
-      .As(mImage);
+    // Create initial ImageView
+    mImageContainer = StackLayout::New(StackOrientation::VERTICAL)
+                        .SetRequestedWidth(MATCH_PARENT)
+                        .SetRequestedHeight(WRAP_CONTENT)
+                        .SetLayoutParams(StackLayoutParams::New().SetWeight(1.0f));
+
+    CreateImageView();
+    return mImageContainer;
+  }
+
+  void CreateImageView()
+  {
+    mImageContainer.RemoveAllChildren();
+
+    switch(mImageTypeIndex)
+    {
+      case 0: // ImageView
+      {
+        ImageView::New(IMAGE_URLS[mImageTypeIndex])
+          .SetRequestedWidth(MATCH_PARENT)
+          .SetRequestedHeight(MATCH_PARENT)
+          .SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO)
+          .SetImageColor(COLORS[mColorIndex].color)
+          .As(mImageView);
+        mImageContainer.Add(mImageView);
+        break;
+      }
+      case 1: // AnimatedImageView (GIF)
+      {
+        AnimatedImageView::New(IMAGE_URLS[mImageTypeIndex])
+          .SetRequestedWidth(MATCH_PARENT)
+          .SetRequestedHeight(MATCH_PARENT)
+          .SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO)
+          .SetImageColor(COLORS[mColorIndex].color)
+          .SetLoopCount(-1)
+          .Play()
+          .As(mAnimatedImageView);
+        mImageContainer.Add(mAnimatedImageView);
+        break;
+      }
+      case 2: // LottieAnimationView
+      {
+        LottieAnimationView::New(IMAGE_URLS[mImageTypeIndex])
+          .SetRequestedWidth(MATCH_PARENT)
+          .SetRequestedHeight(MATCH_PARENT)
+          .SetImageColor(COLORS[mColorIndex].color)
+          .SetLoopCount(-1)
+          .Play()
+          .As(mLottieView);
+        mImageContainer.Add(mLottieView);
+        break;
+      }
+    }
   }
 
   View CreateInfoLabel()
@@ -129,21 +212,32 @@ private:
                                .SetVerticalTextAlignment(Text::Alignment::CENTER),
                            });
 
-    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewImageColorController::OnColorButtonClicked);
-    mButtons[index] = button;
+    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageColorController::OnColorButtonClicked);
+    mColorButtons[index] = button;
     return button;
+  }
+
+  void OnImageTypeClicked(View /*clickedView*/, const InputEvent& /*event*/)
+  {
+    mImageTypeIndex = (mImageTypeIndex + 1) % IMAGE_TYPE_COUNT;
+    Label::DownCast(mImageTypeLabel).SetText(IMAGE_TYPE_NAMES[mImageTypeIndex]);
+    CreateImageView();
+    ApplyCurrentColor();
+    mInfoLabel.SetText(MakeInfoText());
+
+    DALI_LOG_RELEASE_INFO("[ImageColor] Image type changed to: %s\n", IMAGE_TYPE_NAMES[mImageTypeIndex]);
   }
 
   void OnColorButtonClicked(View clickedView, const InputEvent& /*event*/)
   {
     for(int i = 0; i < COLOR_COUNT; ++i)
     {
-      if(mButtons[i] == clickedView)
+      if(mColorButtons[i] == clickedView)
       {
-        mButtons[mColorIndex].SetBackgroundColor(UiColor(0x333333));
+        mColorButtons[mColorIndex].SetBackgroundColor(UiColor(0x333333));
         mColorIndex = i;
-        mButtons[mColorIndex].SetBackgroundColor(UiColor(0x4A90E2));
-        mImage.SetImageColor(COLORS[mColorIndex].color);
+        mColorButtons[mColorIndex].SetBackgroundColor(UiColor(0x4A90E2));
+        ApplyCurrentColor();
         mInfoLabel.SetText(MakeInfoText());
 
         DALI_LOG_RELEASE_INFO("[ImageColor] color changed to: %s\n", COLORS[mColorIndex].name);
@@ -152,9 +246,31 @@ private:
     }
   }
 
+  void ApplyCurrentColor()
+  {
+    const UiColor& color = COLORS[mColorIndex].color;
+    switch(mImageTypeIndex)
+    {
+      case 0:
+        if(mImageView)
+          mImageView.SetImageColor(color);
+        break;
+      case 1:
+        if(mAnimatedImageView)
+          mAnimatedImageView.SetImageColor(color);
+        break;
+      case 2:
+        if(mLottieView)
+          mLottieView.SetImageColor(color);
+        break;
+    }
+  }
+
   Dali::String MakeInfoText() const
   {
-    return Dali::String(COLORS[mColorIndex].name);
+    char buf[128];
+    snprintf(buf, sizeof(buf), "%s — %s", IMAGE_TYPE_NAMES[mImageTypeIndex], COLORS[mColorIndex].name);
+    return Dali::String(buf);
   }
 
   void OnKeyEvent(const KeyEvent& event)
@@ -169,14 +285,20 @@ private:
   }
 
 private:
-  Application&  mApplication;
-  Ui::ImageView mImage;
-  Label         mInfoLabel;
-  View          mButtons[COLOR_COUNT];
-  int           mColorIndex;
+  Application&        mApplication;
+  StackLayout         mImageContainer;
+  Ui::ImageView       mImageView;
+  AnimatedImageView   mAnimatedImageView;
+  LottieAnimationView mLottieView;
+  Label               mInfoLabel;
+  View                mImageTypeButton;
+  View                mImageTypeLabel;
+  View                mColorButtons[COLOR_COUNT];
+  int                 mColorIndex;
+  int                 mImageTypeIndex;
 };
 
-const ImageViewImageColorController::ColorEntry ImageViewImageColorController::COLORS[ImageViewImageColorController::COLOR_COUNT] = {
+const ImageColorController::ColorEntry ImageColorController::COLORS[ImageColorController::COLOR_COUNT] = {
   {"ORIGINAL", UiColor(1.0f, 1.0f, 1.0f, 1.0f)},
   {"RED",      UiColor(1.0f, 0.0f, 0.0f, 1.0f)},
   {"GREEN",    UiColor(0.0f, 1.0f, 0.0f, 1.0f)},
@@ -185,11 +307,23 @@ const ImageViewImageColorController::ColorEntry ImageViewImageColorController::C
   {"50%\nALPHA", UiColor(1.0f, 1.0f, 1.0f, 0.5f)},
 };
 
+const char* ImageColorController::IMAGE_TYPE_NAMES[ImageColorController::IMAGE_TYPE_COUNT] = {
+  "ImageView (JPG)",
+  "AnimatedImageView (GIF)",
+  "LottieAnimationView (JSON)",
+};
+
+const char* ImageColorController::IMAGE_URLS[ImageColorController::IMAGE_TYPE_COUNT] = {
+  RESOURCES_DIR "gallery-large-3.jpg",
+  RESOURCES_DIR "dali-logo-anim.gif",
+  RESOURCES_DIR "jolly_walker.json",
+};
+
 int DALI_EXPORT_API main(int argc, char** argv)
 {
   Application application = Application::New(&argc, &argv);
   UiConfig::New().Apply();
-  ImageViewImageColorController controller(application);
+  ImageColorController controller(application);
   application.MainLoop();
   return 0;
 }

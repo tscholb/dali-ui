@@ -18,6 +18,7 @@
 #include <dali-ui-foundation/integration-api/image-view/animated-image-view-impl.h>
 #include <dali-ui-foundation/public-api/image-view/animated-image-view.h>
 #include <dali-ui-foundation/public-api/ui-color.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -65,6 +66,7 @@ Dali::String AnimatedImageView::GetResourceUrl() const
 {
   return Ui::GetImpl(*this).GetResourceUrl();
 }
+
 AnimatedImageView& AnimatedImageView::Play()
 {
   Ui::GetImpl(*this).Play();
@@ -98,6 +100,185 @@ UiColor AnimatedImageView::GetImageColor() const
 {
   return Ui::GetImpl(*this).GetImageColor();
 }
+AnimatedImageView& AnimatedImageView::JumpToFrame(int frame)
+{
+  Ui::GetImpl(*this).JumpToFrame(frame);
+  return *this;
+}
+AnimatedImageView& AnimatedImageView::SetStopBehavior(StopBehavior::Type behavior)
+{
+  Ui::GetImpl(*this).SetStopBehavior(behavior);
+  return *this;
+}
+AnimatedImageView::StopBehavior::Type AnimatedImageView::GetStopBehavior() const
+{
+  return Ui::GetImpl(*this).GetStopBehavior();
+}
+AnimatedImageView& AnimatedImageView::SetFrameSpeedFactor(float factor)
+{
+  Ui::GetImpl(*this).SetFrameSpeedFactor(factor);
+  return *this;
+}
+float AnimatedImageView::GetFrameSpeedFactor() const
+{
+  return Ui::GetImpl(*this).GetFrameSpeedFactor();
+}
+AnimatedImageView& AnimatedImageView::SetBatchSize(int size)
+{
+  Ui::GetImpl(*this).SetBatchSize(size);
+  return *this;
+}
+int AnimatedImageView::GetBatchSize() const
+{
+  return Ui::GetImpl(*this).GetBatchSize();
+}
+AnimatedImageView& AnimatedImageView::SetCacheSize(int size)
+{
+  Ui::GetImpl(*this).SetCacheSize(size);
+  return *this;
+}
+int AnimatedImageView::GetCacheSize() const
+{
+  return Ui::GetImpl(*this).GetCacheSize();
+}
+AnimatedImageView& AnimatedImageView::SetFrameDelay(int milliseconds)
+{
+  Ui::GetImpl(*this).SetFrameDelay(milliseconds);
+  return *this;
+}
+int AnimatedImageView::GetFrameDelay() const
+{
+  return Ui::GetImpl(*this).GetFrameDelay();
+}
+AnimatedImageView::PlayState::Type AnimatedImageView::GetPlayState() const
+{
+  return Ui::GetImpl(*this).GetPlayState();
+}
+int AnimatedImageView::GetCurrentFrame() const
+{
+  return Ui::GetImpl(*this).GetCurrentFrame();
+}
+int AnimatedImageView::GetTotalFrame() const
+{
+  return Ui::GetImpl(*this).GetTotalFrame();
+}
+AnimatedImageView& AnimatedImageView::SetDesiredWidth(int width)
+{
+  Ui::GetImpl(*this).SetDesiredWidth(width);
+  return *this;
+}
+int AnimatedImageView::GetDesiredWidth() const
+{
+  return Ui::GetImpl(*this).GetDesiredWidth();
+}
+AnimatedImageView& AnimatedImageView::SetDesiredHeight(int height)
+{
+  Ui::GetImpl(*this).SetDesiredHeight(height);
+  return *this;
+}
+int AnimatedImageView::GetDesiredHeight() const
+{
+  return Ui::GetImpl(*this).GetDesiredHeight();
+}
+AnimatedImageView& AnimatedImageView::SetReleasePolicy(Ui::ReleasePolicy::Type releasePolicy)
+{
+  Ui::GetImpl(*this).SetReleasePolicy(releasePolicy);
+  return *this;
+}
+Ui::ReleasePolicy::Type AnimatedImageView::GetReleasePolicy() const
+{
+  return Ui::GetImpl(*this).GetReleasePolicy();
+}
+AnimatedImageView& AnimatedImageView::SetSynchronousLoading(bool synchronous)
+{
+  Ui::GetImpl(*this).SetSynchronousLoading(synchronous);
+  return *this;
+}
+bool AnimatedImageView::IsSynchronousLoading() const
+{
+  return Ui::GetImpl(*this).IsSynchronousLoading();
+}
+AnimatedImageView& AnimatedImageView::SetPreMultipliedAlpha(bool preMultiplied)
+{
+  Ui::GetImpl(*this).SetPreMultipliedAlpha(preMultiplied);
+  return *this;
+}
+bool AnimatedImageView::IsPreMultipliedAlpha() const
+{
+  return Ui::GetImpl(*this).IsPreMultipliedAlpha();
+}
+AnimatedImageView& AnimatedImageView::SetFittingMode(Ui::FittingMode::Type fittingMode)
+{
+  Ui::GetImpl(*this).SetFittingMode(fittingMode);
+  return *this;
+}
+Ui::FittingMode::Type AnimatedImageView::GetFittingMode() const
+{
+  return Ui::GetImpl(*this).GetFittingMode();
+}
+AnimatedImageView& AnimatedImageView::SetSamplingMode(Ui::SamplingMode::Type samplingMode)
+{
+  Ui::GetImpl(*this).SetSamplingMode(samplingMode);
+  return *this;
+}
+Ui::SamplingMode::Type AnimatedImageView::GetSamplingMode() const
+{
+  return Ui::GetImpl(*this).GetSamplingMode();
+}
+AnimatedImageView& AnimatedImageView::SetImageLoadWithViewSize(bool enabled)
+{
+  Ui::GetImpl(*this).SetImageLoadWithViewSize(enabled);
+  return *this;
+}
+bool AnimatedImageView::IsImageLoadWithViewSize() const
+{
+  return Ui::GetImpl(*this).IsImageLoadWithViewSize();
+}
+AnimatedImageView& AnimatedImageView::SetAlphaMaskUrl(const Dali::String& maskUrl)
+{
+  Ui::GetImpl(*this).SetAlphaMaskUrl(maskUrl);
+  return *this;
+}
+Dali::String AnimatedImageView::GetAlphaMaskUrl() const
+{
+  return Ui::GetImpl(*this).GetAlphaMaskUrl();
+}
+AnimatedImageView& AnimatedImageView::SetCropToMask(bool cropToMask)
+{
+  Ui::GetImpl(*this).SetCropToMask(cropToMask);
+  return *this;
+}
+bool AnimatedImageView::IsCropToMask() const
+{
+  return Ui::GetImpl(*this).IsCropToMask();
+}
+AnimatedImageView& AnimatedImageView::SetMaskingMode(Ui::MaskingType::Type maskingMode)
+{
+  Ui::GetImpl(*this).SetMaskingMode(maskingMode);
+  return *this;
+}
+Ui::MaskingType::Type AnimatedImageView::GetMaskingMode() const
+{
+  return Ui::GetImpl(*this).GetMaskingMode();
+}
+AnimatedImageView& AnimatedImageView::SetPlaceholderUrl(const Dali::String& url)
+{
+  Ui::GetImpl(*this).SetPlaceholderUrl(url);
+  return *this;
+}
+Dali::String AnimatedImageView::GetPlaceholderUrl() const
+{
+  return Ui::GetImpl(*this).GetPlaceholderUrl();
+}
+AnimatedImageView& AnimatedImageView::SetImageUrls(const Dali::Vector<Dali::String>& urls)
+{
+  Ui::GetImpl(*this).SetImageUrls(urls);
+  return *this;
+}
+Dali::Vector<Dali::String> AnimatedImageView::GetImageUrls() const
+{
+  return Ui::GetImpl(*this).GetImageUrls();
+}
 Ui::Visual::ResourceStatus AnimatedImageView::GetLoadingStatus() const
 {
   return Ui::GetImpl(*this).GetLoadingStatus();
@@ -105,6 +286,10 @@ Ui::Visual::ResourceStatus AnimatedImageView::GetLoadingStatus() const
 View::ResourceReadySignalType& AnimatedImageView::ResourceReadySignal()
 {
   return View::ResourceReadySignal();
+}
+AnimatedImageView::AnimationFinishedSignalType& AnimatedImageView::AnimationFinishedSignal()
+{
+  return Ui::GetImpl(*this).AnimationFinishedSignal();
 }
 AnimatedImageView::AnimatedImageView(Integration::AnimatedImageViewImpl& implementation)
 : View(implementation)

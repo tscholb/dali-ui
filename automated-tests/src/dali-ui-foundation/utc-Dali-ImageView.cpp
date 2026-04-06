@@ -159,25 +159,26 @@ int UtcDaliImageViewSetGetFittingModeP(void)
 {
   UiTestApplication application;
   ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.GetFittingMode(), Ui::FittingMode::FIT_KEEP_ASPECT_RATIO, TEST_LOCATION);
-
-  view.SetFittingMode(Ui::FittingMode::FILL);
   DALI_TEST_EQUALS(view.GetFittingMode(), Ui::FittingMode::FILL, TEST_LOCATION);
+
+  view.SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO);
+  DALI_TEST_EQUALS(view.GetFittingMode(), Ui::FittingMode::FIT_KEEP_ASPECT_RATIO, TEST_LOCATION);
 
   view.SetFittingMode(Ui::FittingMode::CENTER);
   DALI_TEST_EQUALS(view.GetFittingMode(), Ui::FittingMode::CENTER, TEST_LOCATION);
   END_TEST;
 }
 
-// DesiredSize
+// DesiredWidth / DesiredHeight
 
 int UtcDaliImageViewSetGetDesiredSizeP(void)
 {
   UiTestApplication application;
   ImageView view = ImageView::New();
-  view.SetDesiredSize(ImageDimensions(100, 200));
-  DALI_TEST_EQUALS(view.GetDesiredSize().GetWidth(), static_cast<uint16_t>(100), TEST_LOCATION);
-  DALI_TEST_EQUALS(view.GetDesiredSize().GetHeight(), static_cast<uint16_t>(200), TEST_LOCATION);
+  view.SetDesiredWidth(100);
+  view.SetDesiredHeight(200);
+  DALI_TEST_EQUALS(view.GetDesiredWidth(), 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetDesiredHeight(), 200, TEST_LOCATION);
   END_TEST;
 }
 
