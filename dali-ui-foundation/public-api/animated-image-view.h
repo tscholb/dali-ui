@@ -578,14 +578,14 @@ public: // Not intended for application developers
    *
    * @param[in] implementation The AnimatedImageView implementation
    */
-  explicit DALI_INTERNAL AnimatedImageView(Integration::AnimatedImageViewImpl& implementation);
+  explicit DALI_UI_API AnimatedImageView(Integration::AnimatedImageViewImpl& implementation);
 
   /**
    * @brief Allows the creation of this AnimatedImageView from an Internal::CustomActor pointer.
    *
    * @param[in] internal A pointer to the internal CustomActor
    */
-  explicit DALI_INTERNAL AnimatedImageView(Dali::Internal::CustomActor* internal);
+  explicit DALI_UI_API AnimatedImageView(Dali::Internal::CustomActor* internal);
   /// @endcond
 
 public:

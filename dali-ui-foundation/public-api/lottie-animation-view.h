@@ -587,8 +587,19 @@ public: // Loading Status & Signals
 
 public: // Not intended for application developers
   /// @cond internal
-  explicit DALI_INTERNAL LottieAnimationView(Integration::LottieAnimationViewImpl& implementation);
-  explicit DALI_INTERNAL LottieAnimationView(Dali::Internal::CustomActor* internal);
+  /**
+   * @brief Creates a handle using the Internal implementation.
+   *
+   * @param[in] implementation The LottieAnimationView implementation
+   */
+  explicit DALI_UI_API LottieAnimationView(Integration::LottieAnimationViewImpl& implementation);
+
+  /**
+   * @brief Allows the creation of this LottieAnimationView from an Internal::CustomActor pointer.
+   *
+   * @param[in] internal A pointer to the internal CustomActor
+   */
+  explicit DALI_UI_API LottieAnimationView(Dali::Internal::CustomActor* internal);
   /// @endcond
 
 public:
