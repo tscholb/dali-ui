@@ -394,9 +394,9 @@ int UtcDaliImageViewSetGetImageLoadWithViewSizeP(void)
 {
   UiTestApplication application;
   ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.IsImageLoadWithViewSize(), false, TEST_LOCATION);
-  view.SetImageLoadWithViewSize(true);
-  DALI_TEST_EQUALS(view.IsImageLoadWithViewSize(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.IsImageLoadWithViewSizeEnabled(), false, TEST_LOCATION);
+  view.SetImageLoadWithViewSizeEnabled(true);
+  DALI_TEST_EQUALS(view.IsImageLoadWithViewSizeEnabled(), true, TEST_LOCATION);
   END_TEST;
 }
 
@@ -406,9 +406,9 @@ int UtcDaliImageViewSetGetFastTrackUploadingP(void)
 {
   UiTestApplication application;
   ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.IsFastTrackUploading(), false, TEST_LOCATION);
-  view.SetFastTrackUploading(true);
-  DALI_TEST_EQUALS(view.IsFastTrackUploading(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.IsFastTrackUploadEnabled(), false, TEST_LOCATION);
+  view.SetFastTrackUploadEnabled(true);
+  DALI_TEST_EQUALS(view.IsFastTrackUploadEnabled(), true, TEST_LOCATION);
   END_TEST;
 }
 
@@ -418,9 +418,9 @@ int UtcDaliImageViewSetGetOrientationCorrectionP(void)
 {
   UiTestApplication application;
   ImageView view = ImageView::New();
-  DALI_TEST_EQUALS(view.IsOrientationCorrection(), true, TEST_LOCATION);
-  view.SetOrientationCorrection(false);
-  DALI_TEST_EQUALS(view.IsOrientationCorrection(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.IsOrientationCorrectionEnabled(), true, TEST_LOCATION);
+  view.SetOrientationCorrectionEnabled(false);
+  DALI_TEST_EQUALS(view.IsOrientationCorrectionEnabled(), false, TEST_LOCATION);
   END_TEST;
 }
 

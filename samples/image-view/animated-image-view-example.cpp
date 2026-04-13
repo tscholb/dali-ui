@@ -58,6 +58,9 @@ public:
     mStopBehaviorIndex(0),
     mFrameDelayIndex(1)
   {
+    mMonitorTimer = Timer::New(100);
+    mMonitorTimer.TickSignal().Connect(this, &AnimatedImageViewSampleController::OnMonitorTimerTick);
+
     mApplication.InitSignal().Connect(this, &AnimatedImageViewSampleController::OnInit);
   }
 
@@ -89,6 +92,8 @@ private:
 
     // Apply initial image
     ApplyCurrentImage();
+
+    mMonitorTimer.Start();
   }
 
   // ── Widgets ─────────────────────────────────────────────────────────────
@@ -421,6 +426,18 @@ private:
     }
   }
 
+  bool OnMonitorTimerTick()
+  {
+    if(mAnimatedImageView && mAnimatedImageView.GetPlayState() == AnimatedImageView::PlayState::PLAYING)
+    {
+      DALI_LOG_RELEASE_INFO("[AnimatedImageView] Monitor — frame=%d/%d state=%d\n",
+                            mAnimatedImageView.GetCurrentFrame(),
+                            mAnimatedImageView.GetTotalFrame(),
+                            static_cast<int>(mAnimatedImageView.GetPlayState()));
+    }
+    return true; // continuous
+  }
+
   void OnKeyEvent(const KeyEvent& event)
   {
     if(event.GetState() == KeyEvent::DOWN)
@@ -455,6 +472,7 @@ private:
   View              mSpeedButton;
   View              mStopBehaviorButton;
   View              mFrameDelayButton;
+  Timer             mMonitorTimer;
 
   int mImageIndex;
   int mLoopIndex;

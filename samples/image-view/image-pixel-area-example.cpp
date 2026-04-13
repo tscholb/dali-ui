@@ -38,7 +38,7 @@ using namespace Dali::Ui;
  * - "ANIMATE" button runs a looping PixelArea animation (pan + zoom)
  * - Press Escape or Back to quit
  */
-class ImageViewPixelAreaController : public ConnectionTracker
+class ImagePixelAreaController : public ConnectionTracker
 {
   static constexpr int AREA_COUNT = 6;
 
@@ -54,13 +54,13 @@ class ImageViewPixelAreaController : public ConnectionTracker
   static const char* const GIF_URL;
 
 public:
-  explicit ImageViewPixelAreaController(Application& application)
+  explicit ImagePixelAreaController(Application& application)
   : mApplication(application),
     mActiveIndex(0),
     mUsingGif(false),
     mAnimating(false)
   {
-    mApplication.InitSignal().Connect(this, &ImageViewPixelAreaController::OnInit);
+    mApplication.InitSignal().Connect(this, &ImagePixelAreaController::OnInit);
   }
 
 private:
@@ -71,7 +71,7 @@ private:
 
     window.Add(CreateContents());
 
-    window.KeyEventSignal().Connect(this, &ImageViewPixelAreaController::OnKeyEvent);
+    window.KeyEventSignal().Connect(this, &ImagePixelAreaController::OnKeyEvent);
   }
 
   View CreateContents()
@@ -203,7 +203,7 @@ private:
                                .SetVerticalTextAlignment(Text::Alignment::CENTER),
                            });
 
-    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewPixelAreaController::OnAreaButtonClicked);
+    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImagePixelAreaController::OnAreaButtonClicked);
 
     mButtons[index] = button;
     return button;
@@ -403,10 +403,10 @@ private:
   bool          mAnimating;
 };
 
-const char* const ImageViewPixelAreaController::JPG_URL = RESOURCES_DIR "gallery-large-3.jpg";
-const char* const ImageViewPixelAreaController::GIF_URL = RESOURCES_DIR "dali-logo-anim.gif";
+const char* const ImagePixelAreaController::JPG_URL = RESOURCES_DIR "gallery-large-3.jpg";
+const char* const ImagePixelAreaController::GIF_URL = RESOURCES_DIR "dali-logo-anim.gif";
 
-const ImageViewPixelAreaController::AreaEntry ImageViewPixelAreaController::AREAS[ImageViewPixelAreaController::AREA_COUNT] = {
+const ImagePixelAreaController::AreaEntry ImagePixelAreaController::AREAS[ImagePixelAreaController::AREA_COUNT] = {
   {"FULL",         Vector4(0.0f,  0.0f,  1.0f, 1.0f)},
   {"TOP-L",        Vector4(0.0f,  0.0f,  0.5f, 0.5f)},
   {"TOP-R",        Vector4(0.5f,  0.0f,  0.5f, 0.5f)},
@@ -419,7 +419,7 @@ int DALI_EXPORT_API main(int argc, char** argv)
 {
   Application application = Application::New(&argc, &argv);
   UiConfig::New().Apply();
-  ImageViewPixelAreaController controller(application);
+  ImagePixelAreaController controller(application);
   application.MainLoop();
   return 0;
 }

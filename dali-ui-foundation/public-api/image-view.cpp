@@ -220,15 +220,15 @@ Dali::String ImageView::GetPlaceholderUrl() const
   return Ui::GetImpl(*this).GetPlaceholderUrl();
 }
 
-ImageView& ImageView::SetImageLoadWithViewSize(bool enabled)
+ImageView& ImageView::SetImageLoadWithViewSizeEnabled(bool enabled)
 {
-  Ui::GetImpl(*this).SetImageLoadWithViewSize(enabled);
+  Ui::GetImpl(*this).SetImageLoadWithViewSizeEnabled(enabled);
   return *this;
 }
 
-bool ImageView::IsImageLoadWithViewSize() const
+bool ImageView::IsImageLoadWithViewSizeEnabled() const
 {
-  return Ui::GetImpl(*this).IsImageLoadWithViewSize();
+  return Ui::GetImpl(*this).IsImageLoadWithViewSizeEnabled();
 }
 
 ImageView& ImageView::SetMaskingMode(Ui::MaskingType::Type maskingMode)
@@ -253,26 +253,26 @@ UiColor ImageView::GetImageColor() const
   return Ui::GetImpl(*this).GetImageColor();
 }
 
-ImageView& ImageView::SetFastTrackUploading(bool fastTrack)
+ImageView& ImageView::SetFastTrackUploadEnabled(bool fastTrack)
 {
-  Ui::GetImpl(*this).SetFastTrackUploading(fastTrack);
+  Ui::GetImpl(*this).SetFastTrackUploadEnabled(fastTrack);
   return *this;
 }
 
-bool ImageView::IsFastTrackUploading() const
+bool ImageView::IsFastTrackUploadEnabled() const
 {
-  return Ui::GetImpl(*this).IsFastTrackUploading();
+  return Ui::GetImpl(*this).IsFastTrackUploadEnabled();
 }
 
-ImageView& ImageView::SetOrientationCorrection(bool orientationCorrection)
+ImageView& ImageView::SetOrientationCorrectionEnabled(bool orientationCorrection)
 {
-  Ui::GetImpl(*this).SetOrientationCorrection(orientationCorrection);
+  Ui::GetImpl(*this).SetOrientationCorrectionEnabled(orientationCorrection);
   return *this;
 }
 
-bool ImageView::IsOrientationCorrection() const
+bool ImageView::IsOrientationCorrectionEnabled() const
 {
-  return Ui::GetImpl(*this).IsOrientationCorrection();
+  return Ui::GetImpl(*this).IsOrientationCorrectionEnabled();
 }
 
 ImageView& ImageView::SetNPatchBorder(const Vector4& border)

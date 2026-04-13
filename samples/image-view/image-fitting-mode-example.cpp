@@ -50,7 +50,7 @@ constexpr int GIF_IMAGE_COUNT = 2;
  * - Active fitting mode button is highlighted
  * - Press Escape or Back to quit
  */
-class ImageViewFittingModeController : public ConnectionTracker
+class ImageFittingModeController : public ConnectionTracker
 {
   static constexpr int MODE_COUNT = 4;
 
@@ -68,13 +68,13 @@ class ImageViewFittingModeController : public ConnectionTracker
   };
 
 public:
-  explicit ImageViewFittingModeController(Application& application)
+  explicit ImageFittingModeController(Application& application)
   : mApplication(application),
     mActiveIndex(0),
     mImageIndex(0),
     mGifIndex(0)
   {
-    mApplication.InitSignal().Connect(this, &ImageViewFittingModeController::OnInit);
+    mApplication.InitSignal().Connect(this, &ImageFittingModeController::OnInit);
   }
 
 private:
@@ -85,7 +85,7 @@ private:
 
     window.Add(CreateContents());
 
-    window.KeyEventSignal().Connect(this, &ImageViewFittingModeController::OnKeyEvent);
+    window.KeyEventSignal().Connect(this, &ImageFittingModeController::OnKeyEvent);
   }
 
   View CreateContents()
@@ -201,7 +201,7 @@ private:
                                .SetVerticalTextAlignment(Text::Alignment::CENTER),
                            });
 
-    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewFittingModeController::OnModeButtonClicked);
+    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageFittingModeController::OnModeButtonClicked);
 
     mButtons[index] = button;
     return button;
@@ -225,7 +225,7 @@ private:
                                .SetVerticalTextAlignment(Text::Alignment::CENTER),
                            });
 
-    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewFittingModeController::OnSwapButtonClicked);
+    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageFittingModeController::OnSwapButtonClicked);
 
     mSwapButton = button;
     return button;
@@ -292,13 +292,13 @@ private:
   int               mGifIndex;
 };
 
-constexpr ImageViewFittingModeController::ModeEntry ImageViewFittingModeController::MODES[ImageViewFittingModeController::MODE_COUNT];
+constexpr ImageFittingModeController::ModeEntry ImageFittingModeController::MODES[ImageFittingModeController::MODE_COUNT];
 
 int DALI_EXPORT_API main(int argc, char** argv)
 {
   Application application = Application::New(&argc, &argv);
   UiConfig::New().Apply();
-  ImageViewFittingModeController controller(application);
+  ImageFittingModeController controller(application);
   application.MainLoop();
   return 0;
 }

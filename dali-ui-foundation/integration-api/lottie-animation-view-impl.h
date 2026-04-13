@@ -205,24 +205,24 @@ public: // API
   int GetTotalFrame() const;
 
   /**
-   * @copydoc Dali::Ui::LottieAnimationView::SetRedrawInScalingDown
+   * @copydoc Dali::Ui::LottieAnimationView::SetRedrawOnScaleDown
    */
-  void SetRedrawInScalingDown(bool redraw);
+  void SetRedrawOnScaleDown(bool redraw);
 
   /**
-   * @copydoc Dali::Ui::LottieAnimationView::IsRedrawInScalingDown
+   * @copydoc Dali::Ui::LottieAnimationView::IsRedrawOnScaleDown
    */
-  bool IsRedrawInScalingDown() const;
+  bool IsRedrawOnScaleDown() const;
 
   /**
-   * @copydoc Dali::Ui::LottieAnimationView::SetRedrawInScalingUp
+   * @copydoc Dali::Ui::LottieAnimationView::SetRedrawOnScaleUp
    */
-  void SetRedrawInScalingUp(bool redraw);
+  void SetRedrawOnScaleUp(bool redraw);
 
   /**
-   * @copydoc Dali::Ui::LottieAnimationView::IsRedrawInScalingUp
+   * @copydoc Dali::Ui::LottieAnimationView::IsRedrawOnScaleUp
    */
-  bool IsRedrawInScalingUp() const;
+  bool IsRedrawOnScaleUp() const;
 
   /**
    * @copydoc Dali::Ui::LottieAnimationView::SetEnableFrameCache

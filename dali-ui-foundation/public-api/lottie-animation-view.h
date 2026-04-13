@@ -334,14 +334,14 @@ public: // Performance Options
    * @param[in] redraw True to redraw on scale-down (default: true)
    * @return Reference to this for fluent chaining
    */
-  LottieAnimationView& SetRedrawInScalingDown(bool redraw);
+  LottieAnimationView& SetRedrawOnScaleDown(bool redraw);
 
   /**
    * @brief Returns whether redraw on scale-down is enabled.
    *
    * @return True if redraw on scale-down is enabled
    */
-  bool IsRedrawInScalingDown() const;
+  bool IsRedrawOnScaleDown() const;
 
   /**
    * @brief Sets whether to redraw when the visual is scaled up.
@@ -349,14 +349,14 @@ public: // Performance Options
    * @param[in] redraw True to redraw on scale-up (default: true)
    * @return Reference to this for fluent chaining
    */
-  LottieAnimationView& SetRedrawInScalingUp(bool redraw);
+  LottieAnimationView& SetRedrawOnScaleUp(bool redraw);
 
   /**
    * @brief Returns whether redraw on scale-up is enabled.
    *
    * @return True if redraw on scale-up is enabled
    */
-  bool IsRedrawInScalingUp() const;
+  bool IsRedrawOnScaleUp() const;
 
   /**
    * @brief Enables or disables frame caching.

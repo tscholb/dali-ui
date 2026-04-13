@@ -233,7 +233,7 @@ void LottieAnimationViewImpl::SetProperty(Dali::BaseObject* object, Dali::Proper
         bool redraw;
         if(value.Get(redraw))
         {
-          impl.SetRedrawInScalingDown(redraw);
+          impl.SetRedrawOnScaleDown(redraw);
         }
         break;
       }
@@ -242,7 +242,7 @@ void LottieAnimationViewImpl::SetProperty(Dali::BaseObject* object, Dali::Proper
         bool redraw;
         if(value.Get(redraw))
         {
-          impl.SetRedrawInScalingUp(redraw);
+          impl.SetRedrawOnScaleUp(redraw);
         }
         break;
       }
@@ -329,10 +329,10 @@ Dali::Property::Value LottieAnimationViewImpl::GetProperty(Dali::BaseObject* obj
         value = impl.IsPreMultipliedAlpha();
         break;
       case LottieAnimationViewImpl::Property::REDRAW_IN_SCALING_DOWN:
-        value = impl.IsRedrawInScalingDown();
+        value = impl.IsRedrawOnScaleDown();
         break;
       case LottieAnimationViewImpl::Property::REDRAW_IN_SCALING_UP:
-        value = impl.IsRedrawInScalingUp();
+        value = impl.IsRedrawOnScaleUp();
         break;
       case LottieAnimationViewImpl::Property::ENABLE_FRAME_CACHE:
         value = impl.IsFrameCacheEnabled();
@@ -595,7 +595,7 @@ int LottieAnimationViewImpl::GetTotalFrame() const
   return 0;
 }
 
-void LottieAnimationViewImpl::SetRedrawInScalingDown(bool redraw)
+void LottieAnimationViewImpl::SetRedrawOnScaleDown(bool redraw)
 {
   if(mRedrawInScalingDown != redraw)
   {
@@ -605,12 +605,12 @@ void LottieAnimationViewImpl::SetRedrawInScalingDown(bool redraw)
   }
 }
 
-bool LottieAnimationViewImpl::IsRedrawInScalingDown() const
+bool LottieAnimationViewImpl::IsRedrawOnScaleDown() const
 {
   return mRedrawInScalingDown;
 }
 
-void LottieAnimationViewImpl::SetRedrawInScalingUp(bool redraw)
+void LottieAnimationViewImpl::SetRedrawOnScaleUp(bool redraw)
 {
   if(mRedrawInScalingUp != redraw)
   {
@@ -620,7 +620,7 @@ void LottieAnimationViewImpl::SetRedrawInScalingUp(bool redraw)
   }
 }
 
-bool LottieAnimationViewImpl::IsRedrawInScalingUp() const
+bool LottieAnimationViewImpl::IsRedrawOnScaleUp() const
 {
   return mRedrawInScalingUp;
 }

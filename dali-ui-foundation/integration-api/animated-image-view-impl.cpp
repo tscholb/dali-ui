@@ -296,7 +296,7 @@ void AnimatedImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property
         bool enabled;
         if(value.Get(enabled))
         {
-          impl.SetImageLoadWithViewSize(enabled);
+          impl.SetImageLoadWithViewSizeEnabled(enabled);
         }
         break;
       }
@@ -425,7 +425,7 @@ Dali::Property::Value AnimatedImageViewImpl::GetProperty(Dali::BaseObject* objec
         value = static_cast<int>(impl.GetSamplingMode());
         break;
       case AnimatedImageViewImpl::Property::IMAGE_LOAD_WITH_VIEW_SIZE:
-        value = impl.IsImageLoadWithViewSize();
+        value = impl.IsImageLoadWithViewSizeEnabled();
         break;
       case AnimatedImageViewImpl::Property::ALPHA_MASK_URL:
         value = impl.GetAlphaMaskUrl();
@@ -944,7 +944,7 @@ Ui::SamplingMode::Type AnimatedImageViewImpl::GetSamplingMode() const
   return mSamplingMode;
 }
 
-void AnimatedImageViewImpl::SetImageLoadWithViewSize(bool enabled)
+void AnimatedImageViewImpl::SetImageLoadWithViewSizeEnabled(bool enabled)
 {
   if(mImageLoadWithViewSize != enabled)
   {
@@ -954,7 +954,7 @@ void AnimatedImageViewImpl::SetImageLoadWithViewSize(bool enabled)
   }
 }
 
-bool AnimatedImageViewImpl::IsImageLoadWithViewSize() const
+bool AnimatedImageViewImpl::IsImageLoadWithViewSizeEnabled() const
 {
   return mImageLoadWithViewSize;
 }

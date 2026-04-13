@@ -56,6 +56,9 @@ public:
     mFrameRangeIndex(0),
     mRenderScaleIndex(1)
   {
+    mMonitorTimer = Timer::New(100);
+    mMonitorTimer.TickSignal().Connect(this, &LottieAnimationViewSampleController::OnMonitorTimerTick);
+
     mApplication.InitSignal().Connect(this, &LottieAnimationViewSampleController::OnInit);
   }
 
@@ -84,6 +87,8 @@ private:
         }));
 
     window.KeyEventSignal().Connect(this, &LottieAnimationViewSampleController::OnKeyEvent);
+
+    mMonitorTimer.Start();
   }
 
   // ── Widgets ─────────────────────────────────────────────────────────────
@@ -416,6 +421,18 @@ private:
     }
   }
 
+  bool OnMonitorTimerTick()
+  {
+    if(mLottieView && mLottieView.GetPlayState() == LottieAnimationView::PlayState::PLAYING)
+    {
+      DALI_LOG_RELEASE_INFO("[LottieAnimationView] Monitor — frame=%d/%d state=%d\n",
+                            mLottieView.GetCurrentFrame(),
+                            mLottieView.GetTotalFrame(),
+                            static_cast<int>(mLottieView.GetPlayState()));
+    }
+    return true; // continuous
+  }
+
   void OnKeyEvent(const KeyEvent& event)
   {
     if(event.GetState() == KeyEvent::DOWN)
@@ -449,6 +466,7 @@ private:
   View                mStopBehaviorButton;
   View                mFrameRangeButton;
   View                mRenderScaleButton;
+  Timer               mMonitorTimer;
 
   int mLoopIndex;
   int mLoopingModeIndex;

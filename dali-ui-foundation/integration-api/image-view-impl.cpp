@@ -207,7 +207,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool imageLoadWithViewSize;
         if(value.Get(imageLoadWithViewSize))
         {
-          impl.SetImageLoadWithViewSize(imageLoadWithViewSize);
+          impl.SetImageLoadWithViewSizeEnabled(imageLoadWithViewSize);
         }
         break;
       }
@@ -270,7 +270,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool fastTrack;
         if(value.Get(fastTrack))
         {
-          impl.SetFastTrackUploading(fastTrack);
+          impl.SetFastTrackUploadEnabled(fastTrack);
         }
         break;
       }
@@ -279,7 +279,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool orientationCorrection;
         if(value.Get(orientationCorrection))
         {
-          impl.SetOrientationCorrection(orientationCorrection);
+          impl.SetOrientationCorrectionEnabled(orientationCorrection);
         }
         break;
       }
@@ -348,7 +348,7 @@ Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali:
         value = impl.GetPlaceholderUrl();
         break;
       case Property::IMAGE_LOAD_WITH_VIEW_SIZE:
-        value = impl.IsImageLoadWithViewSize();
+        value = impl.IsImageLoadWithViewSizeEnabled();
         break;
       case Property::ALPHA_MASK_URL:
         value = impl.GetAlphaMaskUrl();
@@ -369,10 +369,10 @@ Dali::Property::Value ImageViewImpl::GetProperty(Dali::BaseObject* object, Dali:
         value = impl.IsSynchronousLoading();
         break;
       case Property::FAST_TRACK_UPLOADING:
-        value = impl.IsFastTrackUploading();
+        value = impl.IsFastTrackUploadEnabled();
         break;
       case Property::ORIENTATION_CORRECTION:
-        value = impl.IsOrientationCorrection();
+        value = impl.IsOrientationCorrectionEnabled();
         break;
       case Property::N_PATCH_BORDER:
         value = impl.GetNPatchBorder();
@@ -544,7 +544,7 @@ int ImageViewImpl::GetDesiredHeight() const
   return mDesiredHeight;
 }
 
-void ImageViewImpl::SetImageLoadWithViewSize(bool enabled)
+void ImageViewImpl::SetImageLoadWithViewSizeEnabled(bool enabled)
 {
   if(mImageLoadWithViewSize != enabled)
   {
@@ -554,7 +554,7 @@ void ImageViewImpl::SetImageLoadWithViewSize(bool enabled)
   }
 }
 
-bool ImageViewImpl::IsImageLoadWithViewSize() const
+bool ImageViewImpl::IsImageLoadWithViewSizeEnabled() const
 {
   return mImageLoadWithViewSize;
 }
@@ -678,7 +678,7 @@ bool ImageViewImpl::IsSynchronousLoading() const
   return mSynchronousLoading;
 }
 
-void ImageViewImpl::SetFastTrackUploading(bool fastTrack)
+void ImageViewImpl::SetFastTrackUploadEnabled(bool fastTrack)
 {
   if(mFastTrackUploading != fastTrack)
   {
@@ -688,12 +688,12 @@ void ImageViewImpl::SetFastTrackUploading(bool fastTrack)
   }
 }
 
-bool ImageViewImpl::IsFastTrackUploading() const
+bool ImageViewImpl::IsFastTrackUploadEnabled() const
 {
   return mFastTrackUploading;
 }
 
-void ImageViewImpl::SetOrientationCorrection(bool orientationCorrection)
+void ImageViewImpl::SetOrientationCorrectionEnabled(bool orientationCorrection)
 {
   if(mOrientationCorrection != orientationCorrection)
   {
@@ -703,7 +703,7 @@ void ImageViewImpl::SetOrientationCorrection(bool orientationCorrection)
   }
 }
 
-bool ImageViewImpl::IsOrientationCorrection() const
+bool ImageViewImpl::IsOrientationCorrectionEnabled() const
 {
   return mOrientationCorrection;
 }

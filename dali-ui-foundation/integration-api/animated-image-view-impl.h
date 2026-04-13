@@ -185,14 +185,14 @@ public: // API
   Ui::SamplingMode::Type GetSamplingMode() const;
 
   /**
-   * @copydoc Dali::Ui::AnimatedImageView::SetImageLoadWithViewSize
+   * @copydoc Dali::Ui::AnimatedImageView::SetImageLoadWithViewSizeEnabled
    */
-  void SetImageLoadWithViewSize(bool enabled);
+  void SetImageLoadWithViewSizeEnabled(bool enabled);
 
   /**
-   * @copydoc Dali::Ui::AnimatedImageView::IsImageLoadWithViewSize
+   * @copydoc Dali::Ui::AnimatedImageView::IsImageLoadWithViewSizeEnabled
    */
-  bool IsImageLoadWithViewSize() const;
+  bool IsImageLoadWithViewSizeEnabled() const;
 
   /**
    * @copydoc Dali::Ui::AnimatedImageView::SetAlphaMaskUrl

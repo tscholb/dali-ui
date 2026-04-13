@@ -40,7 +40,7 @@ using namespace Dali::Ui;
  *
  * Press Escape or Back to quit
  */
-class ImageViewSamplingController : public ConnectionTracker
+class ImageSamplingController : public ConnectionTracker
 {
   static constexpr int SAMPLING_COUNT = 4;
   static constexpr int SIZE_COUNT     = 3;
@@ -67,14 +67,14 @@ class ImageViewSamplingController : public ConnectionTracker
   static const char* IMAGE_TYPE_URLS_DESIRED[IMAGE_TYPE_COUNT_DESIRED];
 
 public:
-  explicit ImageViewSamplingController(Application& application)
+  explicit ImageSamplingController(Application& application)
   : mApplication(application),
     mSamplingIndex(0),
     mSizeIndex(0),
     mImageTypeIndexSampling(0),
     mImageTypeIndexDesired(0)
   {
-    mApplication.InitSignal().Connect(this, &ImageViewSamplingController::OnInit);
+    mApplication.InitSignal().Connect(this, &ImageSamplingController::OnInit);
   }
 
 private:
@@ -85,7 +85,7 @@ private:
 
     window.Add(CreateContents());
 
-    window.KeyEventSignal().Connect(this, &ImageViewSamplingController::OnKeyEvent);
+    window.KeyEventSignal().Connect(this, &ImageSamplingController::OnKeyEvent);
   }
 
   View CreateContents()
@@ -142,7 +142,7 @@ private:
                                    .SetVerticalTextAlignment(Text::Alignment::CENTER)
                                    .As(mSamplingImageTypeLabel),
                                });
-    typeButton.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewSamplingController::OnSamplingImageTypeClicked);
+    typeButton.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageSamplingController::OnSamplingImageTypeClicked);
     mSamplingImageTypeButton = typeButton;
 
     row.Add(typeButton);
@@ -241,7 +241,7 @@ private:
                                .SetVerticalTextAlignment(Text::Alignment::CENTER),
                            });
 
-    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewSamplingController::OnSamplingButtonClicked);
+    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageSamplingController::OnSamplingButtonClicked);
     mSamplingButtons[index] = button;
     return button;
   }
@@ -270,7 +270,7 @@ private:
                                    .SetVerticalTextAlignment(Text::Alignment::CENTER)
                                    .As(mDesiredImageTypeLabel),
                                });
-    typeButton.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewSamplingController::OnDesiredSizeImageTypeClicked);
+    typeButton.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageSamplingController::OnDesiredSizeImageTypeClicked);
     mDesiredImageTypeButton = typeButton;
 
     row.Add(typeButton);
@@ -379,7 +379,7 @@ private:
                                .SetVerticalTextAlignment(Text::Alignment::CENTER),
                            });
 
-    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageViewSamplingController::OnDesiredSizeButtonClicked);
+    button.EnsureInteractiveTrait().ClickedSignal().Connect(this, &ImageSamplingController::OnDesiredSizeButtonClicked);
     mSizeButtons[index] = button;
     return button;
   }
@@ -555,36 +555,36 @@ private:
   int                 mImageTypeIndexDesired;
 };
 
-const ImageViewSamplingController::SamplingEntry ImageViewSamplingController::SAMPLINGS[ImageViewSamplingController::SAMPLING_COUNT] = {
+const ImageSamplingController::SamplingEntry ImageSamplingController::SAMPLINGS[ImageSamplingController::SAMPLING_COUNT] = {
   {"NEAREST",         Ui::SamplingMode::NEAREST},
   {"BOX_THEN\nNEAREST", Ui::SamplingMode::BOX_THEN_NEAREST},
   {"BOX_THEN\nLINEAR",  Ui::SamplingMode::BOX_THEN_LINEAR},
   {"LINEAR",          Ui::SamplingMode::LINEAR},
 };
 
-const ImageViewSamplingController::DesiredSizeEntry ImageViewSamplingController::SIZES[ImageViewSamplingController::SIZE_COUNT] = {
+const ImageSamplingController::DesiredSizeEntry ImageSamplingController::SIZES[ImageSamplingController::SIZE_COUNT] = {
   {"FULL",    ImageDimensions(0, 0)},
   {"128x128",    ImageDimensions(128, 128)},
   {"32x32", ImageDimensions(32, 32)},
 };
 
-const char* ImageViewSamplingController::IMAGE_TYPE_NAMES_SAMPLING[ImageViewSamplingController::IMAGE_TYPE_COUNT_SAMPLING] = {
+const char* ImageSamplingController::IMAGE_TYPE_NAMES_SAMPLING[ImageSamplingController::IMAGE_TYPE_COUNT_SAMPLING] = {
   "ImageView (JPG)",
   "AnimatedImageView (GIF)",
 };
 
-const char* ImageViewSamplingController::IMAGE_TYPE_URLS_SAMPLING[ImageViewSamplingController::IMAGE_TYPE_COUNT_SAMPLING] = {
+const char* ImageSamplingController::IMAGE_TYPE_URLS_SAMPLING[ImageSamplingController::IMAGE_TYPE_COUNT_SAMPLING] = {
   RESOURCES_DIR "gallery-large-3.jpg",
   RESOURCES_DIR "dali-logo-anim.gif",
 };
 
-const char* ImageViewSamplingController::IMAGE_TYPE_NAMES_DESIRED[ImageViewSamplingController::IMAGE_TYPE_COUNT_DESIRED] = {
+const char* ImageSamplingController::IMAGE_TYPE_NAMES_DESIRED[ImageSamplingController::IMAGE_TYPE_COUNT_DESIRED] = {
   "ImageView (JPG)",
   "AnimatedImageView (GIF)",
   "LottieAnimationView (JSON)",
 };
 
-const char* ImageViewSamplingController::IMAGE_TYPE_URLS_DESIRED[ImageViewSamplingController::IMAGE_TYPE_COUNT_DESIRED] = {
+const char* ImageSamplingController::IMAGE_TYPE_URLS_DESIRED[ImageSamplingController::IMAGE_TYPE_COUNT_DESIRED] = {
   RESOURCES_DIR "gallery-large-3.jpg",
   RESOURCES_DIR "dali-logo-anim.gif",
   RESOURCES_DIR "jolly_walker.json",
@@ -594,7 +594,7 @@ int DALI_EXPORT_API main(int argc, char** argv)
 {
   Application application = Application::New(&argc, &argv);
   UiConfig::New().Apply();
-  ImageViewSamplingController controller(application);
+  ImageSamplingController controller(application);
   application.MainLoop();
   return 0;
 }

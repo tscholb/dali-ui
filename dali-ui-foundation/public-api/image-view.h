@@ -318,14 +318,14 @@ public: // Size & Fitting Control
    * @param[in] enabled True to enable loading image with view size
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetImageLoadWithViewSize(bool enabled);
+  ImageView& SetImageLoadWithViewSizeEnabled(bool enabled);
 
   /**
    * @brief Gets whether the image is loaded with the view size.
    *
    * @return True if loading image with view size is enabled
    */
-  bool IsImageLoadWithViewSize() const;
+  bool IsImageLoadWithViewSizeEnabled() const;
 
 public: // Advanced Rendering & Masking
   /**
@@ -450,14 +450,14 @@ public: // Loading Behavior
    * @param[in] fastTrack True to enable fast-track uploading
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetFastTrackUploading(bool fastTrack);
+  ImageView& SetFastTrackUploadEnabled(bool fastTrack);
 
   /**
    * @brief Gets whether fast-track uploading is enabled.
    *
    * @return True if fast-track uploading is enabled
    */
-  bool IsFastTrackUploading() const;
+  bool IsFastTrackUploadEnabled() const;
 
   /**
    * @brief Sets whether EXIF orientation metadata is applied automatically.
@@ -465,14 +465,14 @@ public: // Loading Behavior
    * @param[in] orientationCorrection True to apply orientation correction
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetOrientationCorrection(bool orientationCorrection);
+  ImageView& SetOrientationCorrectionEnabled(bool orientationCorrection);
 
   /**
    * @brief Gets whether orientation correction is enabled.
    *
    * @return True if orientation correction is enabled
    */
-  bool IsOrientationCorrection() const;
+  bool IsOrientationCorrectionEnabled() const;
 
 public: // N-Patch Border
   /**

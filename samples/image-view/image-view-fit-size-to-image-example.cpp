@@ -34,7 +34,7 @@ using namespace Dali::Ui;
  *      match the image's aspect ratio via a second layout pass
  *      (ResourceReady → InvalidateMeasure).
  *
- * @note Do NOT use together with SetImageLoadWithViewSize(true).
+ * @note Do NOT use together with SetImageLoadWithViewSizeEnabled(true).
  *       ImageLoadWithViewSize causes GetNaturalSize to return the current view size
  *       instead of the image's true dimensions, making FitSizeToImage ineffective.
  *
@@ -89,7 +89,7 @@ private:
           .SetRequestedWidth(MATCH_PARENT)
           .SetRequestedHeight(WRAP_CONTENT)
           .SetFitSizeToImage(mFitSizeToImage)
-          .SetImageLoadWithViewSize(false)
+          .SetImageLoadWithViewSizeEnabled(false)
           .As(mFitImage),
       });
   }

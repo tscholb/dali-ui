@@ -167,26 +167,26 @@ int LottieAnimationView::GetTotalFrame() const
   return Ui::GetImpl(*this).GetTotalFrame();
 }
 
-LottieAnimationView& LottieAnimationView::SetRedrawInScalingDown(bool redraw)
+LottieAnimationView& LottieAnimationView::SetRedrawOnScaleDown(bool redraw)
 {
-  Ui::GetImpl(*this).SetRedrawInScalingDown(redraw);
+  Ui::GetImpl(*this).SetRedrawOnScaleDown(redraw);
   return *this;
 }
 
-bool LottieAnimationView::IsRedrawInScalingDown() const
+bool LottieAnimationView::IsRedrawOnScaleDown() const
 {
-  return Ui::GetImpl(*this).IsRedrawInScalingDown();
+  return Ui::GetImpl(*this).IsRedrawOnScaleDown();
 }
 
-LottieAnimationView& LottieAnimationView::SetRedrawInScalingUp(bool redraw)
+LottieAnimationView& LottieAnimationView::SetRedrawOnScaleUp(bool redraw)
 {
-  Ui::GetImpl(*this).SetRedrawInScalingUp(redraw);
+  Ui::GetImpl(*this).SetRedrawOnScaleUp(redraw);
   return *this;
 }
 
-bool LottieAnimationView::IsRedrawInScalingUp() const
+bool LottieAnimationView::IsRedrawOnScaleUp() const
 {
-  return Ui::GetImpl(*this).IsRedrawInScalingUp();
+  return Ui::GetImpl(*this).IsRedrawOnScaleUp();
 }
 
 LottieAnimationView& LottieAnimationView::SetEnableFrameCache(bool enable)

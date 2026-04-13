@@ -466,37 +466,37 @@ int UtcDaliLottieAnimationViewGetTotalFrameP(void)
   END_TEST;
 }
 
-// RedrawInScalingDown / RedrawInScalingUp
+// RedrawOnScaleDown / RedrawOnScaleUp
 
-int UtcDaliLottieAnimationViewSetGetRedrawInScalingDownP(void)
+int UtcDaliLottieAnimationViewSetGetRedrawOnScaleDownP(void)
 {
   UiTestApplication application;
   LottieAnimationView view = LottieAnimationView::New();
 
   // Default should be true
-  DALI_TEST_CHECK(view.IsRedrawInScalingDown());
+  DALI_TEST_CHECK(view.IsRedrawOnScaleDown());
 
-  view.SetRedrawInScalingDown(false);
-  DALI_TEST_CHECK(!view.IsRedrawInScalingDown());
+  view.SetRedrawOnScaleDown(false);
+  DALI_TEST_CHECK(!view.IsRedrawOnScaleDown());
 
-  view.SetRedrawInScalingDown(true);
-  DALI_TEST_CHECK(view.IsRedrawInScalingDown());
+  view.SetRedrawOnScaleDown(true);
+  DALI_TEST_CHECK(view.IsRedrawOnScaleDown());
   END_TEST;
 }
 
-int UtcDaliLottieAnimationViewSetGetRedrawInScalingUpP(void)
+int UtcDaliLottieAnimationViewSetGetRedrawOnScaleUpP(void)
 {
   UiTestApplication application;
   LottieAnimationView view = LottieAnimationView::New();
 
   // Default should be true
-  DALI_TEST_CHECK(view.IsRedrawInScalingUp());
+  DALI_TEST_CHECK(view.IsRedrawOnScaleUp());
 
-  view.SetRedrawInScalingUp(false);
-  DALI_TEST_CHECK(!view.IsRedrawInScalingUp());
+  view.SetRedrawOnScaleUp(false);
+  DALI_TEST_CHECK(!view.IsRedrawOnScaleUp());
 
-  view.SetRedrawInScalingUp(true);
-  DALI_TEST_CHECK(view.IsRedrawInScalingUp());
+  view.SetRedrawOnScaleUp(true);
+  DALI_TEST_CHECK(view.IsRedrawOnScaleUp());
   END_TEST;
 }
 

@@ -101,7 +101,7 @@ private:
       .SetRequestedWidth(MATCH_PARENT)
       .SetRequestedHeight(MATCH_PARENT)
       .SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO)
-      .SetImageLoadWithViewSize(mImageLoadWithViewSize)
+      .SetImageLoadWithViewSizeEnabled(mImageLoadWithViewSize)
       .As(mSyncImage);
 
     mSyncImage.ResourceReadySignal().Connect(this, &ImageViewSizingController::OnSyncImageResourceReady);
@@ -184,7 +184,7 @@ private:
       .SetRequestedWidth(MATCH_PARENT)
       .SetRequestedHeight(MATCH_PARENT)
       .SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO)
-      .SetOrientationCorrection(mOrientationCorrection)
+      .SetOrientationCorrectionEnabled(mOrientationCorrection)
       .As(mOrientationImage);
 
     return StackLayout::New(StackOrientation::VERTICAL)
@@ -245,7 +245,7 @@ private:
   {
     mImageLoadWithViewSize      = !mImageLoadWithViewSize;
     mSyncResourceReadyCount = 0;
-    mSyncImage.SetImageLoadWithViewSize(mImageLoadWithViewSize);
+    mSyncImage.SetImageLoadWithViewSizeEnabled(mImageLoadWithViewSize);
     mSyncSizeLabel.SetText(mImageLoadWithViewSize ? "SYNC_SIZE: ON" : "SYNC_SIZE: OFF");
     mSyncSizeInfoLabel.SetText(MakeSyncSizeInfoText());
     DALI_LOG_RELEASE_INFO("[SyncSizing] ImageLoadWithViewSize toggled → %s\n", mImageLoadWithViewSize ? "ON" : "OFF");
@@ -278,7 +278,7 @@ private:
   void OnOrientationToggleClicked(View /*clickedView*/, const InputEvent& /*event*/)
   {
     mOrientationCorrection = !mOrientationCorrection;
-    mOrientationImage.SetOrientationCorrection(mOrientationCorrection);
+    mOrientationImage.SetOrientationCorrectionEnabled(mOrientationCorrection);
     mOrientationImage.Reload();
     mOrientationLabel.SetText(mOrientationCorrection ? "ORIENTATION CORRECTION: ON" : "ORIENTATION CORRECTION: OFF");
     mOrientationInfoLabel.SetText(MakeOrientationInfoText());

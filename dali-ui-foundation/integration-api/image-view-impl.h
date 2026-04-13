@@ -188,14 +188,14 @@ public: // API — Size & Fitting Control
   int GetDesiredHeight() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetImageLoadWithViewSize
+   * @copydoc Dali::Ui::ImageView::SetImageLoadWithViewSizeEnabled
    */
-  void SetImageLoadWithViewSize(bool enabled);
+  void SetImageLoadWithViewSizeEnabled(bool enabled);
 
   /**
-   * @copydoc Dali::Ui::ImageView::IsImageLoadWithViewSize
+   * @copydoc Dali::Ui::ImageView::IsImageLoadWithViewSizeEnabled
    */
-  bool IsImageLoadWithViewSize() const;
+  bool IsImageLoadWithViewSizeEnabled() const;
 
 public: // API — Advanced Rendering & Masking
   /**
@@ -270,24 +270,24 @@ public: // API — Loading Behavior
   bool IsSynchronousLoading() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetFastTrackUploading
+   * @copydoc Dali::Ui::ImageView::SetFastTrackUploadEnabled
    */
-  void SetFastTrackUploading(bool fastTrack);
+  void SetFastTrackUploadEnabled(bool fastTrack);
 
   /**
-   * @copydoc Dali::Ui::ImageView::IsFastTrackUploading
+   * @copydoc Dali::Ui::ImageView::IsFastTrackUploadEnabled
    */
-  bool IsFastTrackUploading() const;
+  bool IsFastTrackUploadEnabled() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetOrientationCorrection
+   * @copydoc Dali::Ui::ImageView::SetOrientationCorrectionEnabled
    */
-  void SetOrientationCorrection(bool orientationCorrection);
+  void SetOrientationCorrectionEnabled(bool orientationCorrection);
 
   /**
-   * @copydoc Dali::Ui::ImageView::IsOrientationCorrection
+   * @copydoc Dali::Ui::ImageView::IsOrientationCorrectionEnabled
    */
-  bool IsOrientationCorrection() const;
+  bool IsOrientationCorrectionEnabled() const;
 
 public: // API — N-Patch Border
   /**

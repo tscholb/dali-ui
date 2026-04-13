@@ -277,15 +277,15 @@ Ui::SamplingMode::Type AnimatedImageView::GetSamplingMode() const
   return Ui::GetImpl(*this).GetSamplingMode();
 }
 
-AnimatedImageView& AnimatedImageView::SetImageLoadWithViewSize(bool enabled)
+AnimatedImageView& AnimatedImageView::SetImageLoadWithViewSizeEnabled(bool enabled)
 {
-  Ui::GetImpl(*this).SetImageLoadWithViewSize(enabled);
+  Ui::GetImpl(*this).SetImageLoadWithViewSizeEnabled(enabled);
   return *this;
 }
 
-bool AnimatedImageView::IsImageLoadWithViewSize() const
+bool AnimatedImageView::IsImageLoadWithViewSizeEnabled() const
 {
-  return Ui::GetImpl(*this).IsImageLoadWithViewSize();
+  return Ui::GetImpl(*this).IsImageLoadWithViewSizeEnabled();
 }
 
 AnimatedImageView& AnimatedImageView::SetAlphaMaskUrl(const Dali::String& maskUrl)

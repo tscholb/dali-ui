@@ -149,14 +149,14 @@ struct LottieAnimationViewPropertyIndex
     /**
      * @brief Whether to redraw every frame when the view is being scaled down.
      * @details Name "redrawInScalingDown", type Property::BOOLEAN.
-     * @note See also: LottieAnimationView::SetRedrawInScalingDown(), LottieAnimationView::IsRedrawInScalingDown().
+     * @note See also: LottieAnimationView::SetRedrawOnScaleDown(), LottieAnimationView::IsRedrawOnScaleDown().
      */
     REDRAW_IN_SCALING_DOWN,
 
     /**
      * @brief Whether to redraw every frame when the view is being scaled up.
      * @details Name "redrawInScalingUp", type Property::BOOLEAN.
-     * @note See also: LottieAnimationView::SetRedrawInScalingUp(), LottieAnimationView::IsRedrawInScalingUp().
+     * @note See also: LottieAnimationView::SetRedrawOnScaleUp(), LottieAnimationView::IsRedrawOnScaleUp().
      */
     REDRAW_IN_SCALING_UP,
 
