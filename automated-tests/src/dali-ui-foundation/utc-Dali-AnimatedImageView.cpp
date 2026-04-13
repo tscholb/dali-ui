@@ -794,3 +794,63 @@ int UtcDaliAnimatedImageViewPropertyPixelAreaP(void)
   DALI_TEST_EQUALS(view.GetProperty(index).Get<Vector4>(), area, TEST_LOCATION);
   END_TEST;
 }
+
+// =============================================================================
+// AlphaMask
+// =============================================================================
+
+int UtcDaliAnimatedImageViewSetGetAlphaMaskUrlP(void)
+{
+  UiTestApplication application;
+  AnimatedImageView view = AnimatedImageView::New();
+
+  // Default should be empty
+  DALI_TEST_EQUALS(view.GetAlphaMaskUrl(), Dali::String(""), TEST_LOCATION);
+
+  view.SetAlphaMaskUrl("mask.png");
+  DALI_TEST_EQUALS(view.GetAlphaMaskUrl(), Dali::String("mask.png"), TEST_LOCATION);
+
+  view.SetAlphaMaskUrl("circle-mask.png");
+  DALI_TEST_EQUALS(view.GetAlphaMaskUrl(), Dali::String("circle-mask.png"), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageViewSetGetCropToMaskP(void)
+{
+  UiTestApplication application;
+  AnimatedImageView view = AnimatedImageView::New();
+
+  // Default should be false
+  DALI_TEST_CHECK(!view.IsCropToMask());
+
+  view.SetCropToMask(true);
+  DALI_TEST_CHECK(view.IsCropToMask());
+
+  view.SetCropToMask(false);
+  DALI_TEST_CHECK(!view.IsCropToMask());
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageViewSetGetMaskingModeP(void)
+{
+  UiTestApplication application;
+  AnimatedImageView view = AnimatedImageView::New();
+
+  view.SetMaskingMode(Ui::MaskingType::MASKING_ON_LOADING);
+  DALI_TEST_EQUALS(view.GetMaskingMode(), Ui::MaskingType::MASKING_ON_LOADING, TEST_LOCATION);
+
+  view.SetMaskingMode(Ui::MaskingType::MASKING_ON_RENDERING);
+  DALI_TEST_EQUALS(view.GetMaskingMode(), Ui::MaskingType::MASKING_ON_RENDERING, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageViewAlphaMaskNoChangeP(void)
+{
+  UiTestApplication application;
+  AnimatedImageView view = AnimatedImageView::New();
+
+  view.SetAlphaMaskUrl("mask.png");
+  view.SetAlphaMaskUrl("mask.png"); // same value
+  DALI_TEST_EQUALS(view.GetAlphaMaskUrl(), Dali::String("mask.png"), TEST_LOCATION);
+  END_TEST;
+}
