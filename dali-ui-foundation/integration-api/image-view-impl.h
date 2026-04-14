@@ -188,9 +188,9 @@ public: // API — Size & Fitting Control
   int GetDesiredHeight() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetImageLoadWithViewSizeEnabled
+   * @copydoc Dali::Ui::ImageView::SetImageLoadWithViewSize
    */
-  void SetImageLoadWithViewSizeEnabled(bool enabled);
+  void SetImageLoadWithViewSize(bool enabled);
 
   /**
    * @copydoc Dali::Ui::ImageView::IsImageLoadWithViewSizeEnabled
@@ -270,9 +270,9 @@ public: // API — Loading Behavior
   bool IsSynchronousLoading() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetFastTrackUploadEnabled
+   * @copydoc Dali::Ui::ImageView::SetFastTrackUpload
    */
-  void SetFastTrackUploadEnabled(bool fastTrack);
+  void SetFastTrackUpload(bool fastTrack);
 
   /**
    * @copydoc Dali::Ui::ImageView::IsFastTrackUploadEnabled
@@ -280,9 +280,9 @@ public: // API — Loading Behavior
   bool IsFastTrackUploadEnabled() const;
 
   /**
-   * @copydoc Dali::Ui::ImageView::SetOrientationCorrectionEnabled
+   * @copydoc Dali::Ui::ImageView::SetOrientationCorrection
    */
-  void SetOrientationCorrectionEnabled(bool orientationCorrection);
+  void SetOrientationCorrection(bool orientationCorrection);
 
   /**
    * @copydoc Dali::Ui::ImageView::IsOrientationCorrectionEnabled

@@ -277,9 +277,9 @@ Ui::SamplingMode::Type AnimatedImageView::GetSamplingMode() const
   return Ui::GetImpl(*this).GetSamplingMode();
 }
 
-AnimatedImageView& AnimatedImageView::SetImageLoadWithViewSizeEnabled(bool enabled)
+AnimatedImageView& AnimatedImageView::SetImageLoadWithViewSize(bool enabled)
 {
-  Ui::GetImpl(*this).SetImageLoadWithViewSizeEnabled(enabled);
+  Ui::GetImpl(*this).SetImageLoadWithViewSize(enabled);
   return *this;
 }
 

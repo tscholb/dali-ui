@@ -296,7 +296,7 @@ void AnimatedImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property
         bool enabled;
         if(value.Get(enabled))
         {
-          impl.SetImageLoadWithViewSizeEnabled(enabled);
+          impl.SetImageLoadWithViewSize(enabled);
         }
         break;
       }
@@ -944,7 +944,7 @@ Ui::SamplingMode::Type AnimatedImageViewImpl::GetSamplingMode() const
   return mSamplingMode;
 }
 
-void AnimatedImageViewImpl::SetImageLoadWithViewSizeEnabled(bool enabled)
+void AnimatedImageViewImpl::SetImageLoadWithViewSize(bool enabled)
 {
   if(mImageLoadWithViewSize != enabled)
   {

@@ -174,21 +174,21 @@ struct ImageViewPropertyIndex
     /**
      * @brief Whether the view size is used as the image load size.
      * @details Name "imageLoadWithViewSize", type Property::BOOLEAN.
-     * @note See also: ImageView::SetImageLoadWithViewSizeEnabled(), ImageView::IsImageLoadWithViewSizeEnabled().
+     * @note See also: ImageView::SetImageLoadWithViewSize(), ImageView::IsImageLoadWithViewSizeEnabled().
      */
     IMAGE_LOAD_WITH_VIEW_SIZE,
 
     /**
      * @brief Whether fast-track GPU uploading is enabled.
      * @details Name "fastTrackUploading", type Property::BOOLEAN.
-     * @note See also: ImageView::SetFastTrackUploadEnabled(), ImageView::IsFastTrackUploadEnabled().
+     * @note See also: ImageView::SetFastTrackUpload(), ImageView::IsFastTrackUploadEnabled().
      */
     FAST_TRACK_UPLOADING,
 
     /**
      * @brief Whether EXIF orientation metadata is applied automatically.
      * @details Name "orientationCorrection", type Property::BOOLEAN.
-     * @note See also: ImageView::SetOrientationCorrectionEnabled(), ImageView::IsOrientationCorrectionEnabled().
+     * @note See also: ImageView::SetOrientationCorrection(), ImageView::IsOrientationCorrectionEnabled().
      */
     ORIENTATION_CORRECTION,
 

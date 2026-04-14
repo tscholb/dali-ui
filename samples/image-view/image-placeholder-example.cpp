@@ -26,6 +26,15 @@ using namespace Dali::Ui;
 
 /**
  * Image Placeholder sample — supports ImageView, AnimatedImageView, and LottieAnimationView.
+ *
+ * Flow:
+ *   1. View is created with a placeholder image but NO main URL → placeholder shown immediately.
+ *   2. After 2 seconds a timer fires, sets the main URL and starts playback.
+ *   3. ResourceReadySignal fires when loading completes → placeholder removed automatically.
+ *
+ * Buttons:
+ *   [TYPE]   — toggles between IMAGE / ANIMATED / LOTTIE and restarts the cycle.
+ *   [RELOAD] — restarts the placeholder → main-image cycle for the current type.
  */
 class ImagePlaceholderController : public ConnectionTracker
 {
@@ -86,18 +95,21 @@ private:
 
   void ResetImage()
   {
+    // Stop any pending load timer from a previous cycle.
+    if(mLoadTimer && mLoadTimer.IsRunning()) { mLoadTimer.Stop(); }
+
     if(mImage) { mContainer.Remove(mImage); mImage.Reset(); }
 
-    const char* mainUrl = TYPE_URLS[(int)mViewType];
-
+    // Step 1: create view with placeholder only — no main URL yet.
+    // MATCH_PARENT height ensures the view fills the weighted container so the placeholder is visible.
     switch(mViewType)
     {
       case ViewType::ANIMATED:
       {
         AnimatedImageView view = AnimatedImageView::New();
-        view.SetRequestedWidth(MATCH_PARENT).SetRequestedHeight(WRAP_CONTENT);
+        view.SetRequestedWidth(MATCH_PARENT).SetRequestedHeight(MATCH_PARENT);
         view.SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO);
-        view.SetPlaceholderUrl(RESOURCES_DIR "placeholder.png");
+        view.SetPlaceholderUrl(RESOURCES_DIR "placeholder_image.png");
         view.SetLoopCount(-1);
         view.ResourceReadySignal().Connect(this, &ImagePlaceholderController::OnResourceReady);
         mImage = view;
@@ -106,8 +118,8 @@ private:
       case ViewType::LOTTIE:
       {
         LottieAnimationView view = LottieAnimationView::New();
-        view.SetRequestedWidth(MATCH_PARENT).SetRequestedHeight(WRAP_CONTENT);
-        view.SetPlaceholderUrl(RESOURCES_DIR "placeholder.png");
+        view.SetRequestedWidth(MATCH_PARENT).SetRequestedHeight(MATCH_PARENT);
+        view.SetPlaceholderUrl(RESOURCES_DIR "placeholder_image.png");
         view.SetLoopCount(-1);
         view.ResourceReadySignal().Connect(this, &ImagePlaceholderController::OnResourceReady);
         mImage = view;
@@ -116,9 +128,9 @@ private:
       default:
       {
         ImageView view = ImageView::New();
-        view.SetRequestedWidth(MATCH_PARENT).SetRequestedHeight(WRAP_CONTENT);
+        view.SetRequestedWidth(MATCH_PARENT).SetRequestedHeight(MATCH_PARENT);
         view.SetFittingMode(Ui::FittingMode::FIT_KEEP_ASPECT_RATIO);
-        view.SetPlaceholderUrl(RESOURCES_DIR "placeholder.png");
+        view.SetPlaceholderUrl(RESOURCES_DIR "placeholder_image.png");
         view.ResourceReadySignal().Connect(this, &ImagePlaceholderController::OnResourceReady);
         mImage = view;
         break;
@@ -126,6 +138,18 @@ private:
     }
 
     mContainer.Add(mImage);
+    mStatusLabel.SetText("Placeholder shown — loading in 2s...");
+    DALI_LOG_ERROR("[Placeholder] Type=%s — placeholder shown, main URL pending\n", TYPE_NAMES[(int)mViewType]);
+
+    // Step 2: fire the main URL after 2 seconds so the placeholder is visible long enough.
+    mLoadTimer = Timer::New(2000);
+    mLoadTimer.TickSignal().Connect(this, &ImagePlaceholderController::OnLoadTimerTick);
+    mLoadTimer.Start();
+  }
+
+  bool OnLoadTimerTick()
+  {
+    const char* mainUrl = TYPE_URLS[(int)mViewType];
 
     switch(mViewType)
     {
@@ -142,8 +166,9 @@ private:
         break;
     }
 
-    mStatusLabel.SetText("Loading placeholder...");
-    DALI_LOG_ERROR("[Placeholder] Type=%s url=%s\n", TYPE_NAMES[(int)mViewType], mainUrl);
+    mStatusLabel.SetText("Loading main image...");
+    DALI_LOG_ERROR("[Placeholder] Timer fired — url=%s\n", mainUrl);
+    return false; // one-shot
   }
 
   void OnTypeToggleClicked(View, const InputEvent&)
@@ -171,6 +196,7 @@ private:
   View         mContainer;
   Label        mTypeButton;
   Label        mStatusLabel;
+  Timer        mLoadTimer;
   ViewType     mViewType;
 };
 

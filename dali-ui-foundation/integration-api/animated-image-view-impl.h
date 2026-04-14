@@ -185,9 +185,9 @@ public: // API
   Ui::SamplingMode::Type GetSamplingMode() const;
 
   /**
-   * @copydoc Dali::Ui::AnimatedImageView::SetImageLoadWithViewSizeEnabled
+   * @copydoc Dali::Ui::AnimatedImageView::SetImageLoadWithViewSize
    */
-  void SetImageLoadWithViewSizeEnabled(bool enabled);
+  void SetImageLoadWithViewSize(bool enabled);
 
   /**
    * @copydoc Dali::Ui::AnimatedImageView::IsImageLoadWithViewSizeEnabled

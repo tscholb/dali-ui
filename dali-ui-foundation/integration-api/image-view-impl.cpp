@@ -207,7 +207,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool imageLoadWithViewSize;
         if(value.Get(imageLoadWithViewSize))
         {
-          impl.SetImageLoadWithViewSizeEnabled(imageLoadWithViewSize);
+          impl.SetImageLoadWithViewSize(imageLoadWithViewSize);
         }
         break;
       }
@@ -270,7 +270,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool fastTrack;
         if(value.Get(fastTrack))
         {
-          impl.SetFastTrackUploadEnabled(fastTrack);
+          impl.SetFastTrackUpload(fastTrack);
         }
         break;
       }
@@ -279,7 +279,7 @@ void ImageViewImpl::SetProperty(Dali::BaseObject* object, Dali::Property::Index 
         bool orientationCorrection;
         if(value.Get(orientationCorrection))
         {
-          impl.SetOrientationCorrectionEnabled(orientationCorrection);
+          impl.SetOrientationCorrection(orientationCorrection);
         }
         break;
       }
@@ -544,7 +544,7 @@ int ImageViewImpl::GetDesiredHeight() const
   return mDesiredHeight;
 }
 
-void ImageViewImpl::SetImageLoadWithViewSizeEnabled(bool enabled)
+void ImageViewImpl::SetImageLoadWithViewSize(bool enabled)
 {
   if(mImageLoadWithViewSize != enabled)
   {
@@ -678,7 +678,7 @@ bool ImageViewImpl::IsSynchronousLoading() const
   return mSynchronousLoading;
 }
 
-void ImageViewImpl::SetFastTrackUploadEnabled(bool fastTrack)
+void ImageViewImpl::SetFastTrackUpload(bool fastTrack)
 {
   if(mFastTrackUploading != fastTrack)
   {
@@ -693,7 +693,7 @@ bool ImageViewImpl::IsFastTrackUploadEnabled() const
   return mFastTrackUploading;
 }
 
-void ImageViewImpl::SetOrientationCorrectionEnabled(bool orientationCorrection)
+void ImageViewImpl::SetOrientationCorrection(bool orientationCorrection)
 {
   if(mOrientationCorrection != orientationCorrection)
   {

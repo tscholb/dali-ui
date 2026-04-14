@@ -164,7 +164,7 @@ public: // Image
    * @param[in] enabled True to enable loading image with view size
    * @return Reference to this for fluent chaining
    */
-  AnimatedImageView& SetImageLoadWithViewSizeEnabled(bool enabled);
+  AnimatedImageView& SetImageLoadWithViewSize(bool enabled);
 
   /**
    * @brief Gets whether the image is loaded with the view size.

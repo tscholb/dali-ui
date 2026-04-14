@@ -191,7 +191,7 @@ struct AnimatedImageViewPropertyIndex
     /**
      * @brief Whether the image is loaded at the current view size.
      * @details Name "imageLoadWithViewSize", type Property::BOOLEAN.
-     * @note See also: AnimatedImageView::SetImageLoadWithViewSizeEnabled(), AnimatedImageView::IsImageLoadWithViewSizeEnabled().
+     * @note See also: AnimatedImageView::SetImageLoadWithViewSize(), AnimatedImageView::IsImageLoadWithViewSizeEnabled().
      */
     IMAGE_LOAD_WITH_VIEW_SIZE,
 

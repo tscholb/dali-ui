@@ -220,9 +220,9 @@ Dali::String ImageView::GetPlaceholderUrl() const
   return Ui::GetImpl(*this).GetPlaceholderUrl();
 }
 
-ImageView& ImageView::SetImageLoadWithViewSizeEnabled(bool enabled)
+ImageView& ImageView::SetImageLoadWithViewSize(bool enabled)
 {
-  Ui::GetImpl(*this).SetImageLoadWithViewSizeEnabled(enabled);
+  Ui::GetImpl(*this).SetImageLoadWithViewSize(enabled);
   return *this;
 }
 
@@ -253,9 +253,9 @@ UiColor ImageView::GetImageColor() const
   return Ui::GetImpl(*this).GetImageColor();
 }
 
-ImageView& ImageView::SetFastTrackUploadEnabled(bool fastTrack)
+ImageView& ImageView::SetFastTrackUpload(bool fastTrack)
 {
-  Ui::GetImpl(*this).SetFastTrackUploadEnabled(fastTrack);
+  Ui::GetImpl(*this).SetFastTrackUpload(fastTrack);
   return *this;
 }
 
@@ -264,9 +264,9 @@ bool ImageView::IsFastTrackUploadEnabled() const
   return Ui::GetImpl(*this).IsFastTrackUploadEnabled();
 }
 
-ImageView& ImageView::SetOrientationCorrectionEnabled(bool orientationCorrection)
+ImageView& ImageView::SetOrientationCorrection(bool orientationCorrection)
 {
-  Ui::GetImpl(*this).SetOrientationCorrectionEnabled(orientationCorrection);
+  Ui::GetImpl(*this).SetOrientationCorrection(orientationCorrection);
   return *this;
 }
 

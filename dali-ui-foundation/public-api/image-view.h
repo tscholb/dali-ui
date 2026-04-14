@@ -318,7 +318,7 @@ public: // Size & Fitting Control
    * @param[in] enabled True to enable loading image with view size
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetImageLoadWithViewSizeEnabled(bool enabled);
+  ImageView& SetImageLoadWithViewSize(bool enabled);
 
   /**
    * @brief Gets whether the image is loaded with the view size.
@@ -450,7 +450,7 @@ public: // Loading Behavior
    * @param[in] fastTrack True to enable fast-track uploading
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetFastTrackUploadEnabled(bool fastTrack);
+  ImageView& SetFastTrackUpload(bool fastTrack);
 
   /**
    * @brief Gets whether fast-track uploading is enabled.
@@ -465,7 +465,7 @@ public: // Loading Behavior
    * @param[in] orientationCorrection True to apply orientation correction
    * @return Reference to this for fluent chaining
    */
-  ImageView& SetOrientationCorrectionEnabled(bool orientationCorrection);
+  ImageView& SetOrientationCorrection(bool orientationCorrection);
 
   /**
    * @brief Gets whether orientation correction is enabled.
