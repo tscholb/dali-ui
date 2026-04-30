@@ -323,7 +323,7 @@ void AnimatedImageVisual::CreateImageCache()
 
 AnimatedImageVisual::AnimatedImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory,
                                          ImageDimensions desiredSize)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Ui::Visual::ANIMATED_IMAGE),
+: Visual::Base(factoryCache, Ui::Visual::ANIMATED_IMAGE),
   mFrameDelayTimer(),
   mPlacementActor(),
   mImageVisualShaderFactory(shaderFactory),
@@ -1617,6 +1617,11 @@ void AnimatedImageVisual::OnControlInheritedVisibilityChanged(Actor actor, bool 
     DALI_LOG_INFO(gAnimImgLogFilter, Debug::Verbose,
                   "AnimatedImageVisual::OnControlInheritedVisibilityChanged: invisibile. Pause animation [%p]\n", this);
   }
+}
+
+void AnimatedImageVisual::ApplyFittingMode(const Vector2& controlSize, const Extents& padding)
+{
+  DoApplyFittingMode(controlSize, padding, mImpl->mFittingMode);
 }
 
 } // namespace Internal

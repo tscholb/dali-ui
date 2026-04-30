@@ -281,7 +281,7 @@ void TextVisual::EnablePreMultipliedAlpha(bool preMultiplied)
 }
 
 TextVisual::TextVisual(VisualFactoryCache& factoryCache, TextVisualShaderFactory& shaderFactory)
-: Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, Ui::Visual::TEXT),
+: Visual::Base(factoryCache, Ui::Visual::TEXT),
   mController(Text::Controller::New()),
   mTypesetter(Text::Typesetter::New(mController->GetTextModel())),
   mAsyncTextInterface(nullptr),
