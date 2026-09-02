@@ -145,6 +145,15 @@ public:
 
 public: // from Visual
   /**
+   * @brief Releases the URL/cache ownership of an external texture.
+   *
+   * This is used when a client takes over updating the renderer's TextureSet
+   * directly. The renderer keeps its current texture; the visual no longer
+   * pins the original external resource.
+   */
+  void ReleaseExternalTextureOwnership();
+
+  /**
    * @copydoc Visual::Base::GetNaturalSize
    */
   void GetNaturalSize(Vector2& naturalSize) override;
