@@ -667,6 +667,7 @@ public:
 
   inline void Finish(void) override
   {
+    ++mFinishCallCount;
   }
 
   inline void Flush(void) override
@@ -2054,11 +2055,40 @@ public:
 
   inline void DeleteSync(GLsync sync) override
   {
+    ++mDeleteSyncCallCount;
   }
 
   inline GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) override
   {
-    return 0;
+    ++mClientWaitSyncCallCount;
+    return mClientWaitSyncResult;
+  }
+
+  void SetClientWaitSyncResult(GLenum result)
+  {
+    mClientWaitSyncResult = result;
+  }
+
+  void ResetSyncCallCounts()
+  {
+    mClientWaitSyncCallCount = 0u;
+    mFinishCallCount         = 0u;
+    mDeleteSyncCallCount     = 0u;
+  }
+
+  uint32_t GetClientWaitSyncCallCount() const
+  {
+    return mClientWaitSyncCallCount;
+  }
+
+  uint32_t GetFinishCallCount() const
+  {
+    return mFinishCallCount;
+  }
+
+  uint32_t GetDeleteSyncCallCount() const
+  {
+    return mDeleteSyncCallCount;
   }
 
   inline void WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout) override
@@ -2884,6 +2914,10 @@ public:
 
   ScissorParams   mScissorParams;
   ColorMaskParams mColorMaskParams;
+  uint32_t        mClientWaitSyncCallCount{0u};
+  GLenum          mClientWaitSyncResult{0u};
+  uint32_t        mFinishCallCount{0u};
+  uint32_t        mDeleteSyncCallCount{0u};
 };
 
 template<>
