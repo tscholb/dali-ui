@@ -242,6 +242,24 @@ ImageVisual::~ImageVisual()
   }
 }
 
+void ImageVisual::ReleaseExternalTextureOwnership()
+{
+  if(!mImageUrl.IsValid() || mImageUrl.GetProtocolType() != VisualUrl::TEXTURE)
+  {
+    return;
+  }
+
+  if(DALI_LIKELY(Dali::Adaptor::IsAvailable()))
+  {
+    mImageUrl.DecreaseExternalResourceReference(mFactoryCache.GetTextureManager());
+    RemoveTexture(false);
+  }
+
+  mImageUrl = VisualUrl();
+  mTextures.Reset();
+  mNativeTexture.Reset();
+}
+
 void ImageVisual::DoSetProperties(const Property::Map& propertyMap)
 {
   // Url is already received in constructor
