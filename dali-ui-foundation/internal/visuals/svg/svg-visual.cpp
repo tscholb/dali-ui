@@ -29,6 +29,8 @@
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/integration-api/visuals/image-visual-properties-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-properties-integ.h>
+#include <dali-ui-foundation/internal/layouts/layout-invalidation-generation.h>
+#include <dali-ui-foundation/internal/views/view/view-data-impl.h>
 #include <dali-ui-foundation/internal/visuals/image/image-visual-shader-factory.h>
 #include <dali-ui-foundation/internal/visuals/image/image-visual-shader-feature-builder.h>
 #include <dali-ui-foundation/internal/visuals/svg/svg-loader.h>
@@ -311,6 +313,15 @@ void SvgVisual::DoSetOnScene(Actor& actor)
     {
       // SVG visual needs it's size set before it can be rasterized hence request relayout once on stage
       mImpl->mEventObserver->RelayoutRequest(*this);
+
+      // Without a rasterization size, ResourceReady cannot wake the pending
+      // layout yet. Resume size negotiation after the current layout pass.
+      if(!(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0) &&
+         !mRasterizeCompleted && Adaptor::IsAvailable() &&
+         (ViewDataImpl::IsLayoutPassOnStack() || LayoutInvalidation::IsLayoutFinishedEmitInProgress()))
+      {
+        Adaptor::Get().RequestProcessEventsOnIdle();
+      }
     }
 
     if(mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0)

@@ -776,3 +776,61 @@ int UtcDaliLottieAnimationViewDeferredResourceUsesRegisteredVisualReadiness(void
   DALI_TEST_CHECK(readyCount > 1);
   END_TEST;
 }
+
+namespace
+{
+struct LoadLottieDuringMeasure
+{
+  LottieAnimationView image;
+  const char*         url;
+  int                 count{0};
+  MeasuredSize        Measure(View, float, float)
+  {
+    ++count;
+    if(count == 1)
+    {
+      image.SetResourceUrl(url);
+    }
+    image.Measure(200.0f, 200.0f);
+    return MeasuredSize(200.0f, 200.0f);
+  }
+  LayoutRect Arrange(View, const LayoutRect& bounds)
+  {
+    image.Arrange(LayoutRect(0.0f, 0.0f, 200.0f, 200.0f));
+    return bounds;
+  }
+};
+} // namespace
+
+int UtcDaliLottieAnimationViewSynchronousFailureDuringMeasureResumesLayout(void)
+{
+  UiTestApplication   application;
+  LottieAnimationView view = LottieAnimationView::New();
+  view.SetSynchronousLoading(true);
+  view.SetRequestedWidth(200.0f);
+  view.SetRequestedHeight(200.0f);
+  LoadLottieDuringMeasure producer{view, "invalid.json"};
+  View                    root = View::New();
+  root.SetRequestedWidth(200.0f);
+  root.SetRequestedHeight(200.0f);
+  root.Add(view);
+  root.SetMeasureCallback(MeasureCallback::New(&producer, &LoadLottieDuringMeasure::Measure));
+  root.SetArrangeCallback(ArrangeCallback::New(&producer, &LoadLottieDuringMeasure::Arrange));
+  application.GetWindow().Add(root);
+
+  // A synchronous failure has no later worker event to resume the parent layout.
+  // Drive only the idle processing requested by the framework.
+  unsigned int passes = 0u;
+  do
+  {
+    application.GetRenderController().Initialize();
+    application.SendNotification();
+    ++passes;
+  } while(WasProcessEventsOnIdleRequested(application) && passes < 5u);
+
+  DALI_TEST_CHECK(!WasProcessEventsOnIdleRequested(application));
+  DALI_TEST_CHECK(!Ui::Internal::ViewDataImpl::Get(Ui::GetImpl(root)).IsMeasureDirty());
+  DALI_TEST_CHECK(!Ui::Internal::ViewDataImpl::Get(Ui::GetImpl(view)).IsMeasureDirty());
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+  END_TEST;
+}

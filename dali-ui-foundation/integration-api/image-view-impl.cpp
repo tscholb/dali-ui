@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -31,6 +32,7 @@
 #include <dali-ui-foundation/integration-api/visuals/image-visual-properties-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-actions-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-properties-integ.h>
+#include <dali-ui-foundation/internal/layouts/layout-invalidation-generation.h>
 #include <dali-ui-foundation/internal/views/view/view-data-impl.h>
 #include <dali-ui-foundation/internal/visuals/visual-base-impl.h>
 #include <dali-ui-foundation/public-api/image-loader/image-url.h>
@@ -48,6 +50,17 @@ namespace Integration
 namespace
 {
 const AttachmentId IMAGE_URL_ATTACHMENT_ID = AttachmentId::Alloc();
+
+void RequestImageLayoutProcessing(Actor actor)
+{
+  // Resource completion can invalidate layout while its normal idle wake is
+  // suppressed. Let the pending layout run after this pass.
+  if((Internal::ViewDataImpl::IsLayoutPassOnStack() || Internal::LayoutInvalidation::IsLayoutFinishedEmitInProgress()) &&
+     Adaptor::IsAvailable() && actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  {
+    Adaptor::Get().RequestProcessEventsOnIdle();
+  }
+}
 
 BaseHandle CreateImageView()
 {
@@ -819,6 +832,8 @@ void ImageViewImpl::UpdatePlaceholderVisual()
 
 void ImageViewImpl::OnViewResourceReady(Ui::View view)
 {
+  RequestImageLayoutProcessing(view);
+
   // Only process when the main image visual becomes ready
   auto& viewData = Internal::ViewDataImpl::Get(*this);
   if(viewData.GetVisualResourceStatus(ImageViewImpl::Property::IMAGE) != Ui::Visual::ResourceStatus::READY)

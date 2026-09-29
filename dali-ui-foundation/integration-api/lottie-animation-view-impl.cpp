@@ -22,6 +22,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-array.h>
@@ -36,6 +37,7 @@
 #include <dali-ui-foundation/integration-api/visuals/image-visual-properties-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-actions-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-properties-integ.h>
+#include <dali-ui-foundation/internal/layouts/layout-invalidation-generation.h>
 #include <dali-ui-foundation/internal/views/view/view-data-impl.h>
 #include <dali-ui-foundation/internal/visuals/visual-base-impl.h>
 #include <dali-ui-foundation/public-api/types/ui-color.h>
@@ -1201,6 +1203,14 @@ void LottieAnimationViewImpl::UpdatePlaceholderVisual()
 
 void LottieAnimationViewImpl::OnViewResourceReady(Ui::View view)
 {
+  // Completion during layout can leave a pending pass without an idle wake.
+  // Include synchronous failures, which have no worker completion to wake it.
+  if((Internal::ViewDataImpl::IsLayoutPassOnStack() || Internal::LayoutInvalidation::IsLayoutFinishedEmitInProgress()) &&
+     Adaptor::IsAvailable() && view.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE))
+  {
+    Adaptor::Get().RequestProcessEventsOnIdle();
+  }
+
   if(!mVisual)
   {
     return;
