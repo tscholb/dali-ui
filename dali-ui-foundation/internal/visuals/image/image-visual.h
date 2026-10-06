@@ -143,6 +143,11 @@ public:
   static ImageVisualPtr New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, Ui::Integration::VisualFactory::CreationOptions creationOptions,
                             const VisualUrl& imageUrl, ImageDimensions size = ImageDimensions());
 
+  /**
+   * @copydoc Visual::Base::SetInitialLoadingSizeProvider
+   */
+  void SetInitialLoadingSizeProvider(InitialLoadingSizeProvider provider) override;
+
 public: // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
@@ -252,6 +257,11 @@ public:
   void FastLoadComplete(FastTrackLoadingTaskPtr task);
 
 private:
+  /**
+   * @brief Resolves the initial load size from the current placement actor.
+   */
+  void SetInitialLoadingSize(Actor& actor);
+
   /**
    * Allocate the mask data when a masking property is defined in the property map
    */
@@ -369,6 +379,8 @@ private:
   WeakHandle<Actor>                  mPlacementActor;
   VisualUrl                          mImageUrl;
   TextureManager::MaskingDataPointer mMaskingData;
+
+  InitialLoadingSizeProvider mInitialLoadingSizeProvider;
 
   Dali::ImageDimensions     mDesiredSize;
   Dali::ImageDimensions     mLastRequiredSize;

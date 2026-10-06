@@ -30,6 +30,7 @@
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/actors/layer.h>
+#include <cmath>
 #include <cstring> // for strlen()
 
 // INTERNAL HEADERS
@@ -186,6 +187,7 @@ ImageVisual::ImageVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFact
   mPlacementActor(),
   mImageUrl(imageUrl),
   mMaskingData(),
+  mInitialLoadingSizeProvider(nullptr),
   mDesiredSize(size),
   mLastRequiredSize(size),
   mTextureId(TextureManager::INVALID_TEXTURE_ID),
@@ -906,10 +908,39 @@ void ImageVisual::InitializeRenderer()
   }
 }
 
+void ImageVisual::SetInitialLoadingSizeProvider(InitialLoadingSizeProvider provider)
+{
+  mInitialLoadingSizeProvider = provider;
+}
+
+void ImageVisual::SetInitialLoadingSize(Actor& actor)
+{
+  // CENTER needs the image's natural dimensions; custom transforms own their size.
+  if(!mInitialLoadingSizeProvider || !mImageLoadWithViewSize ||
+     mLoadState != TextureManager::LoadState::NOT_STARTED ||
+     mFittingMode == Ui::Image::FittingMode::CENTER || !mImpl->mTransformMapUsingDefault ||
+     (mImpl->mFlags & Visual::Base::Impl::IS_FITTING_MODE_IGNORE_VIEW_PADDING) ||
+     mImageUrl.GetProtocolType() == VisualUrl::TEXTURE)
+  {
+    return;
+  }
+
+  const Vector2 size   = mInitialLoadingSizeProvider(actor);
+  const float   width  = std::round(size.width);
+  const float   height = std::round(size.height);
+  if(std::isfinite(width) && std::isfinite(height) && width > 0.0f && height > 0.0f)
+  {
+    const float maximum = std::numeric_limits<uint16_t>::max();
+    mLastRequiredSize   = ImageDimensions(static_cast<uint16_t>(std::min(width, maximum)),
+                                          static_cast<uint16_t>(std::min(height, maximum)));
+  }
+}
+
 void ImageVisual::DoSetOnScene(Actor& actor)
 {
   if(mImageUrl.IsValid())
   {
+    SetInitialLoadingSize(actor);
     InitializeRenderer();
   }
 
@@ -1125,14 +1156,18 @@ void ImageVisual::OnSetTransform()
 
   if(mImageLoadWithViewSize)
   {
-    // Get current visual size
-    Vector2  size                    = mImpl->GetTransformVisualSize(mImpl->mControlSize);
-    uint32_t maximumNumber           = std::numeric_limits<uint16_t>::max();
-    uint32_t sizeWidth               = static_cast<uint32_t>(roundf(size.width));
-    sizeWidth                        = std::min(sizeWidth, maximumNumber);
-    uint32_t sizeHeight              = static_cast<uint32_t>(roundf(size.height));
-    sizeHeight                       = std::min(sizeHeight, maximumNumber);
-    Dali::ImageDimensions visualSize = Dali::ImageDimensions(sizeWidth, sizeHeight);
+    const Vector2 size   = mImpl->GetTransformVisualSize(mImpl->mControlSize);
+    const float   width  = std::round(size.width);
+    const float   height = std::round(size.height);
+    // Layout/scale updates can arrive before the view has a usable content size.
+    // Keep the existing texture instead of requesting the original (or an overflowed size).
+    if(!std::isfinite(width) || !std::isfinite(height) || width <= 0.0f || height <= 0.0f)
+    {
+      return;
+    }
+    const float                 maximum = std::numeric_limits<uint16_t>::max();
+    const Dali::ImageDimensions visualSize(static_cast<uint16_t>(std::min(width, maximum)),
+                                           static_cast<uint16_t>(std::min(height, maximum)));
 
     // Reload if visual size is updated
     if(mLastRequiredSize != visualSize)
@@ -1145,6 +1180,12 @@ void ImageVisual::OnSetTransform()
       UpdateNativeTextureInfomation(Dali::TextureSet());
 
       LoadTexture(mTextures, visualSize, TextureManager::ReloadPolicy::CACHED);
+      if(mTextures && mImpl->mRenderer)
+      {
+        // Synchronous loads and cache hits return textures without an async callback.
+        // Bind them and release the temporary handle through the initial attachment path.
+        InitializeRenderer();
+      }
     }
   }
 }
