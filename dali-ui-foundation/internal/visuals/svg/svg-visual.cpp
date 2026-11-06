@@ -27,6 +27,7 @@
 #include <dali/integration-api/string-utils.h>
 
 // INTERNAL INCLUDES
+#include <dali-ui-foundation/integration-api/visuals/image-visual-actions-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/image-visual-properties-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-properties-integ.h>
 #include <dali-ui-foundation/internal/visuals/image/image-visual-shader-factory.h>
@@ -117,6 +118,7 @@ SvgVisual::SvgVisual(VisualFactoryCache& factoryCache, ImageVisualShaderFactory&
   mDefaultWidth(0),
   mDefaultHeight(0),
   mPlacementActor(),
+  mSceneActor(),
   mDesiredSize(size),
   mLoadPolicy(Ui::Image::LoadPolicy::ATTACHED),
   mReleasePolicy(Ui::Image::ReleasePolicy::DETACHED),
@@ -295,6 +297,7 @@ void SvgVisual::DoSetOnScene(Actor& actor)
   // Hold the weak handle of the placement actor and delay the adding of renderer until the svg rasterization is
   // finished.
   mPlacementActor = actor;
+  mSceneActor     = actor;
 
   if(mLoadFailed)
   {
@@ -355,6 +358,7 @@ void SvgVisual::DoSetOffScene(Actor& actor)
 
   actor.RemoveRenderer(mImpl->mRenderer);
   mPlacementActor.Reset();
+  mSceneActor.Reset();
 }
 
 void SvgVisual::GetNaturalSize(Vector2& naturalSize)
@@ -406,6 +410,70 @@ void SvgVisual::DoCreatePropertyMap(Property::Map& map) const
 void SvgVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 {
   // Do nothing
+}
+
+void SvgVisual::OnDoAction(const Property::Index actionId, const Property::Value& attributes)
+{
+  switch(actionId)
+  {
+    case Ui::Integration::ImageVisual::Action::RELOAD:
+    {
+      Reload();
+      break;
+    }
+  }
+}
+
+void SvgVisual::Reload()
+{
+  // Release the current requests first. This also removes our observers, so results of the old file never arrive.
+  if(mSvgRasterizeId != SvgLoader::INVALID_SVG_RASTERIZE_ID)
+  {
+    mSvgLoader.RequestRasterizeRemove(mSvgRasterizeId, this, false);
+    mSvgRasterizeId = SvgLoader::INVALID_SVG_RASTERIZE_ID;
+  }
+  if(mSvgLoadId != SvgLoader::INVALID_SVG_LOAD_ID)
+  {
+    mSvgLoader.RequestLoadRemove(mSvgLoadId, this);
+    mSvgLoadId = SvgLoader::INVALID_SVG_LOAD_ID;
+  }
+
+  if(mLoadFailed && mImpl->mRenderer)
+  {
+    // The broken image replaced the geometry, shader and textures. Restore the svg ones before loading again.
+    Geometry geometry = mFactoryCache.GetGeometry(VisualFactoryCache::QUAD_GEOMETRY);
+    mImpl->mRenderer.SetGeometry(geometry);
+    UpdateShader();
+    mImpl->mRenderer.RemoveTextures();
+  }
+
+  mLoadCompleted      = false;
+  mRasterizeCompleted = false;
+  mLoadFailed         = false;
+  mRasterizeForcibly  = true;
+
+  // Notify before loading, because a synchronous load reports the result inside the calls below.
+  ResourceReady(Ui::Visual::ResourceStatus::PREPARING);
+
+  if(IsOnScene())
+  {
+    // The renderer is already on the actor. Placing it again lets EmitResourceReady show the broken image on failure.
+    mPlacementActor = mSceneActor;
+  }
+
+  const bool synchronousLoading =
+    IsSynchronousLoadingRequired() && (mImageUrl.IsLocalResource() || mImageUrl.IsBufferResource());
+  mSvgLoadId = mSvgLoader.Load(mImageUrl, this, synchronousLoading, true);
+
+  if(IsOnScene())
+  {
+    // Off scene, DoSetOnScene and OnSetTransform rasterize later. On scene, the size may not change, so ask now.
+    const Dali::ImageDimensions size = (mDesiredSize.GetWidth() > 0 && mDesiredSize.GetHeight() > 0) ? mDesiredSize : mLastRequiredSize;
+    if(!mLoadFailed && size.GetWidth() > 0 && size.GetHeight() > 0)
+    {
+      AddRasterizationTask(size);
+    }
+  }
 }
 
 void SvgVisual::EmitResourceReady(Ui::Visual::ResourceStatus resourceStatus)
