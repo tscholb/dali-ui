@@ -107,9 +107,12 @@ public:
    * @param[in] url to retrieve
    * @param[in] svgObserver The SvgVisual that requested loading.
    * @param[in] synchronousLoading True if the image will be loaded in synchronous time.
+   * @param[in] forceReload True to read the url again even if it is cached. The cached entry keeps serving its
+   *            current users, but later requests for the same url use the newly loaded data.
    * @return id of the load request.
    */
-  SvgLoadId Load(const VisualUrl& url, SvgLoaderObserver* svgObserver, bool synchronousLoading);
+  SvgLoadId Load(const VisualUrl& url, SvgLoaderObserver* svgObserver, bool synchronousLoading,
+                 bool forceReload = false);
 
   /**
    * @brief Request to rasterize an SVG file.
@@ -231,7 +234,8 @@ public:
       mVectorImageRenderer(Dali::VectorImageRenderer::New()),
       mObservers(),
       mReferenceCount(1u),
-      mKeepUnusedTexture(false)
+      mKeepUnusedTexture(false),
+      mReplaced(false)
     {
     }
     ~SvgLoadInfo()
@@ -246,12 +250,14 @@ public:
       mVectorImageRenderer(std::move(info.mVectorImageRenderer)),
       mObservers(std::move(info.mObservers)),
       mReferenceCount(info.mReferenceCount),
-      mKeepUnusedTexture(info.mKeepUnusedTexture)
+      mKeepUnusedTexture(info.mKeepUnusedTexture),
+      mReplaced(info.mReplaced)
     {
       info.mTask.Reset();
       info.mVectorImageRenderer.Reset();
       info.mReferenceCount    = 0;
       info.mKeepUnusedTexture = false;
+      info.mReplaced          = false;
     }
     SvgLoadInfo& operator=(SvgLoadInfo&& info) noexcept // move operator
     {
@@ -269,11 +275,13 @@ public:
 
         mReferenceCount    = info.mReferenceCount;
         mKeepUnusedTexture = info.mKeepUnusedTexture;
+        mReplaced          = info.mReplaced;
 
         info.mTask.Reset();
         info.mVectorImageRenderer.Reset();
         info.mReferenceCount    = 0;
         info.mKeepUnusedTexture = false;
+        info.mReplaced          = false;
       }
       return *this;
     }
@@ -296,6 +304,7 @@ public:
 
     int32_t mReferenceCount;    ///< The number of Svg visuals that use this data.
     bool    mKeepUnusedTexture; ///< True if the unused resource should be kept until explicitly cleared.
+    bool    mReplaced;          ///< True if a forced reload replaced this entry. Url lookups skip it.
   };
 
   /**

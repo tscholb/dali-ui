@@ -2234,3 +2234,225 @@ int UtcDaliImageViewReloadBeforeZeroSizeLayout(void)
 {
   return TestReloadBeforeImageSize(true);
 }
+
+namespace
+{
+// Writes SVG documents whose intrinsic size identifies which file content was loaded.
+struct SvgFileFixture
+{
+  SvgFileFixture()
+  : path(std::filesystem::temp_directory_path() /
+         ("dali-ui-svg-reload-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".svg"))
+  {
+  }
+  ~SvgFileFixture()
+  {
+    std::error_code error;
+    std::filesystem::remove(path, error);
+  }
+  bool Write(uint32_t width, uint32_t height)
+  {
+    std::ofstream stream(path, std::ios::binary | std::ios::trunc);
+    stream << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" << width << "\" height=\"" << height << "\">"
+           << "<rect width=\"" << width << "\" height=\"" << height << "\" fill=\"#ff0000\"/></svg>";
+    return stream.good();
+  }
+  bool WriteBroken()
+  {
+    std::ofstream stream(path, std::ios::binary | std::ios::trunc);
+    stream << "not an svg document";
+    return stream.good();
+  }
+  std::filesystem::path path;
+};
+
+// Drives event processing until the view reports a final resource status.
+void WaitForSvgResource(UiTestApplication& application, ImageView view, bool synchronous)
+{
+  for(int i = 0; i < 8; ++i)
+  {
+    application.SendNotification();
+    application.Render();
+    if(view.GetLoadingStatus() != Ui::Visual::ResourceStatus::PREPARING)
+    {
+      return;
+    }
+    if(!synchronous)
+    {
+      Test::WaitForEventThreadTrigger(1, 1);
+    }
+  }
+}
+
+Texture SvgTexture(ImageView view)
+{
+  auto       visual   = DataOf(view).GetVisual(ImageView::Property::IMAGE);
+  TextureSet textures = Ui::GetImplementation(visual).GetRenderer().GetTextures();
+  return (textures && textures.GetTextureCount() > 0u) ? textures.GetTexture(0) : Texture();
+}
+
+ImageView CreateSvgView(UiTestApplication& application, const SvgFileFixture& fixture, bool synchronous, int& readyCount)
+{
+  auto view = ImageView::New();
+  view.SetRequestedWidth(64.0f);
+  view.SetRequestedHeight(64.0f);
+  view.SetSynchronousLoading(synchronous);
+  view.SetResourceUrl(fixture.path.string().c_str());
+  view.ResourceReadySignal().Connect(&application, [&readyCount](View)
+  { ++readyCount; });
+  application.GetScene().Add(view);
+  return view;
+}
+
+int TestSvgReloadPicksUpChangedFile(bool synchronous)
+{
+  UiTestApplication application;
+  SvgFileFixture    fixture;
+  DALI_TEST_CHECK(fixture.Write(40u, 20u));
+
+  int  readyCount = 0;
+  auto view       = CreateSvgView(application, fixture, synchronous, readyCount);
+  WaitForSvgResource(application, view, synchronous);
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetNaturalSize(), Vector3(40.0f, 20.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
+  Texture before = SvgTexture(view);
+  DALI_TEST_CHECK(before);
+
+  // Overwrite the same path. The requested size stays 64x64, so only a reload can refresh the content.
+  DALI_TEST_CHECK(fixture.Write(80u, 60u));
+  readyCount = 0;
+  view.Reload();
+  if(!synchronous)
+  {
+    DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::PREPARING, TEST_LOCATION);
+  }
+  WaitForSvgResource(application, view, synchronous);
+
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetNaturalSize(), Vector3(80.0f, 60.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
+  Texture after = SvgTexture(view);
+  DALI_TEST_CHECK(after);
+  DALI_TEST_CHECK(after != before);
+  END_TEST;
+}
+} // namespace
+
+int UtcDaliImageViewSvgReloadSynchronous(void)
+{
+  return TestSvgReloadPicksUpChangedFile(true);
+}
+
+int UtcDaliImageViewSvgReloadAsynchronous(void)
+{
+  return TestSvgReloadPicksUpChangedFile(false);
+}
+
+// Reload refreshes only the view that asked for it. Views created afterwards share the new content.
+int UtcDaliImageViewSvgReloadSharedUrl(void)
+{
+  UiTestApplication application;
+  SvgFileFixture    fixture;
+  DALI_TEST_CHECK(fixture.Write(40u, 20u));
+
+  int  firstReady  = 0;
+  int  secondReady = 0;
+  auto first       = CreateSvgView(application, fixture, true, firstReady);
+  auto second      = CreateSvgView(application, fixture, true, secondReady);
+  WaitForSvgResource(application, first, true);
+  WaitForSvgResource(application, second, true);
+  DALI_TEST_EQUALS(first.GetNaturalSize(), Vector3(40.0f, 20.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(second.GetNaturalSize(), Vector3(40.0f, 20.0f, 0.0f), TEST_LOCATION);
+
+  DALI_TEST_CHECK(fixture.Write(80u, 60u));
+  first.Reload();
+  WaitForSvgResource(application, first, true);
+  DALI_TEST_EQUALS(first.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(first.GetNaturalSize(), Vector3(80.0f, 60.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(second.GetNaturalSize(), Vector3(40.0f, 20.0f, 0.0f), TEST_LOCATION);
+
+  int  thirdReady = 0;
+  auto third      = CreateSvgView(application, fixture, true, thirdReady);
+  WaitForSvgResource(application, third, true);
+  DALI_TEST_EQUALS(third.GetNaturalSize(), Vector3(80.0f, 60.0f, 0.0f), TEST_LOCATION);
+
+  second.Reload();
+  WaitForSvgResource(application, second, true);
+  DALI_TEST_EQUALS(second.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(second.GetNaturalSize(), Vector3(80.0f, 60.0f, 0.0f), TEST_LOCATION);
+  END_TEST;
+}
+
+// A broken file reports FAILED. Fixing the file and reloading recovers, and breaking it again fails again.
+int UtcDaliImageViewSvgReloadRecoversFromFailure(void)
+{
+  UiTestApplication application(CreatePlaceholderFailureConfig());
+  SvgFileFixture    fixture;
+  DALI_TEST_CHECK(fixture.WriteBroken());
+
+  int  readyCount = 0;
+  auto view       = CreateSvgView(application, fixture, true, readyCount);
+  WaitForSvgResource(application, view, true);
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  DALI_TEST_CHECK(fixture.Write(40u, 20u));
+  readyCount = 0;
+  view.Reload();
+  WaitForSvgResource(application, view, true);
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetNaturalSize(), Vector3(40.0f, 20.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
+
+  DALI_TEST_CHECK(fixture.WriteBroken());
+  readyCount = 0;
+  view.Reload();
+  WaitForSvgResource(application, view, true);
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+// Reloading while the first asynchronous load is still pending delivers only the new content.
+int UtcDaliImageViewSvgReloadDuringAsynchronousLoad(void)
+{
+  UiTestApplication application;
+  SvgFileFixture    fixture;
+  DALI_TEST_CHECK(fixture.Write(40u, 20u));
+
+  int  readyCount = 0;
+  auto view       = CreateSvgView(application, fixture, false, readyCount);
+  DALI_TEST_CHECK(fixture.Write(80u, 60u));
+  view.Reload();
+  WaitForSvgResource(application, view, false);
+
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetNaturalSize(), Vector3(80.0f, 60.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+// Reloading an off-scene view applies the new content once the view is attached again.
+int UtcDaliImageViewSvgReloadOffScene(void)
+{
+  UiTestApplication application;
+  SvgFileFixture    fixture;
+  DALI_TEST_CHECK(fixture.Write(40u, 20u));
+
+  int  readyCount = 0;
+  auto view       = CreateSvgView(application, fixture, true, readyCount);
+  WaitForSvgResource(application, view, true);
+  DALI_TEST_EQUALS(view.GetNaturalSize(), Vector3(40.0f, 20.0f, 0.0f), TEST_LOCATION);
+
+  view.Unparent();
+  DALI_TEST_CHECK(fixture.Write(80u, 60u));
+  view.Reload();
+  readyCount = 0;
+  application.GetScene().Add(view);
+  WaitForSvgResource(application, view, true);
+
+  DALI_TEST_EQUALS(view.GetLoadingStatus(), Ui::Visual::ResourceStatus::READY, TEST_LOCATION);
+  DALI_TEST_EQUALS(view.GetNaturalSize(), Vector3(80.0f, 60.0f, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
+  END_TEST;
+}

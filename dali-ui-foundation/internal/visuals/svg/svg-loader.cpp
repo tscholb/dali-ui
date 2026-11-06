@@ -158,10 +158,22 @@ SvgLoader::SvgRasterizeId SvgLoader::GenerateUniqueSvgRasterizeId()
 }
 
 SvgLoader::SvgLoadId SvgLoader::Load(const VisualUrl& url, SvgLoaderObserver* svgObserver,
-                                     bool synchronousLoading)
+                                     bool synchronousLoading, bool forceReload)
 {
   SvgLoadId loadId     = SvgLoader::INVALID_SVG_LOAD_ID;
   auto      cacheIndex = FindCacheIndexFromLoadCache(url);
+
+  if(forceReload && cacheIndex != SvgLoader::INVALID_SVG_CACHE_INDEX)
+  {
+    // A loaded renderer never parses new data, so the file must be read into a new entry.
+    // The old entry stays alive for its current users and is removed by the usual reference counting.
+    DALI_ASSERT_ALWAYS(static_cast<size_t>(cacheIndex) < mLoadCache.size() && "Invalid cache index");
+    mLoadCache[cacheIndex].mReplaced = true;
+    DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General,
+                  "SvgLoader::Load( url=%s observer=%p ) Force reload. Replace cached index:%d loadId@%d\n",
+                  url.GetUrl().c_str(), svgObserver, cacheIndex, mLoadCache[cacheIndex].mId);
+    cacheIndex = SvgLoader::INVALID_SVG_CACHE_INDEX;
+  }
 
   // Newly append cache now.
   if(cacheIndex == SvgLoader::INVALID_SVG_CACHE_INDEX)
@@ -527,7 +539,7 @@ SvgLoader::SvgCacheIndex SvgLoader::FindCacheIndexFromLoadCache(const VisualUrl&
 
   for(uint32_t i = 0; i < size; ++i)
   {
-    if(mLoadCache[i].mImageUrl.GetUrl() == imageUrl.GetUrl())
+    if(!mLoadCache[i].mReplaced && mLoadCache[i].mImageUrl.GetUrl() == imageUrl.GetUrl())
     {
       return static_cast<SvgCacheIndex>(i);
     }

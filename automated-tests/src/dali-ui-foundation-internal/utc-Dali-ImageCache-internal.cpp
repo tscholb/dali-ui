@@ -17,6 +17,10 @@
 #include <dali-ui-foundation/dali-ui-foundation.h>
 #include <dali-ui-test-suite-utils.h>
 
+#include <chrono>
+#include <filesystem>
+#include <fstream>
+
 #define private public
 #include <dali-ui-foundation/integration-api/visuals/image-visual-properties-integ.h>
 #include <dali-ui-foundation/integration-api/visuals/visual-properties-integ.h>
@@ -1638,5 +1642,70 @@ int UtcDaliTextureManagerImmediateCornerRadiusSingleObserverP(void)
   DALI_TEST_CHECK(view.GetLoadingStatus() == Dali::Ui::Visual::ResourceStatus::READY);
   DALI_TEST_EQUALS(readyCount, 1, TEST_LOCATION);
   DALI_TEST_EQUALS(view.GetRendererCount(), 1u, TEST_LOCATION);
+  END_TEST;
+}
+
+// A forced load replaces the cached entry for later requests while the old entry stays valid for its users.
+int UtcDaliSvgLoaderForceReloadReplacesCachedEntryP(void)
+{
+  UiTestApplication application;
+  auto&             loader = GetFactoryCache().GetSvgLoader();
+
+  const std::filesystem::path path = std::filesystem::temp_directory_path() /
+                                     ("dali-ui-svg-force-reload-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".svg");
+  auto writeSvg = [&path](uint32_t width, uint32_t height)
+  {
+    std::ofstream stream(path, std::ios::binary | std::ios::trunc);
+    stream << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" << width << "\" height=\"" << height << "\">"
+           << "<rect width=\"" << width << "\" height=\"" << height << "\"/></svg>";
+    return stream.good();
+  };
+  const Dali::Ui::Internal::VisualUrl url(path.string().c_str());
+
+  DALI_TEST_CHECK(writeSvg(40u, 20u));
+  auto oldLoadId = loader.Load(url, nullptr, true);
+  auto oldRaster = loader.Rasterize(oldLoadId, 32u, 32u, nullptr, true);
+  uint32_t width = 0u, height = 0u;
+  loader.GetVectorImageRenderer(oldLoadId).GetDefaultSize(width, height);
+  DALI_TEST_EQUALS(width, 40u, TEST_LOCATION);
+  DALI_TEST_EQUALS(height, 20u, TEST_LOCATION);
+
+  // Without force, the cached entry is reused even though the file changed.
+  DALI_TEST_CHECK(writeSvg(80u, 60u));
+  auto cachedLoadId = loader.Load(url, nullptr, true);
+  DALI_TEST_EQUALS(cachedLoadId, oldLoadId, TEST_LOCATION);
+  loader.RequestLoadRemove(cachedLoadId, nullptr);
+
+  auto newLoadId = loader.Load(url, nullptr, true, true);
+  DALI_TEST_CHECK(newLoadId != oldLoadId);
+  loader.GetVectorImageRenderer(newLoadId).GetDefaultSize(width, height);
+  DALI_TEST_EQUALS(width, 80u, TEST_LOCATION);
+  DALI_TEST_EQUALS(height, 60u, TEST_LOCATION);
+
+  // The old entry keeps its renderer and rasterized data for the users that still hold it.
+  loader.GetVectorImageRenderer(oldLoadId).GetDefaultSize(width, height);
+  DALI_TEST_EQUALS(width, 40u, TEST_LOCATION);
+  auto newRaster = loader.Rasterize(newLoadId, 32u, 32u, nullptr, true);
+  DALI_TEST_CHECK(newRaster != oldRaster);
+
+  // Later requests share the new entry.
+  auto laterLoadId = loader.Load(url, nullptr, true);
+  DALI_TEST_EQUALS(laterLoadId, newLoadId, TEST_LOCATION);
+
+  // Releasing the old users removes the replaced entry. The new entry stays.
+  loader.RequestRasterizeRemove(oldRaster, nullptr, false);
+  loader.RequestLoadRemove(oldLoadId, nullptr);
+  application.SendNotification();
+  DALI_TEST_CHECK(!loader.GetVectorImageRenderer(oldLoadId));
+  DALI_TEST_CHECK(loader.GetVectorImageRenderer(newLoadId));
+
+  loader.RequestRasterizeRemove(newRaster, nullptr, false);
+  loader.RequestLoadRemove(laterLoadId, nullptr);
+  loader.RequestLoadRemove(newLoadId, nullptr);
+  application.SendNotification();
+  DALI_TEST_CHECK(!loader.GetVectorImageRenderer(newLoadId));
+
+  std::error_code error;
+  std::filesystem::remove(path, error);
   END_TEST;
 }

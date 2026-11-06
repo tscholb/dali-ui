@@ -166,6 +166,11 @@ protected:
    */
   Shader GenerateShader() const override;
 
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  void OnDoAction(const Property::Index actionId, const Property::Value& attributes) override;
+
 protected: // Implementation of  SvgLoaderObserver
   /**
    * @copydoc Dali::Ui::Internal::SvgLoaderObserver::LoadComplete
@@ -193,6 +198,12 @@ private:
   void DoSetProperty(Property::Index index, const Property::Value& value);
 
   /**
+   * @brief Reads the svg file again and rasterizes the new content.
+   * The current image stays on screen until the new content is ready.
+   */
+  void Reload();
+
+  /**
    * @brief Emit ResourceReady signal.
    * @note MUST call this API end of function.
    */
@@ -215,6 +226,7 @@ private:
   uint32_t              mDefaultWidth;
   uint32_t              mDefaultHeight;
   WeakHandle<Actor>     mPlacementActor;
+  WeakHandle<Actor>     mSceneActor; ///< The actor this visual is on scene with. Reload uses it to place the renderer again.
   Dali::ImageDimensions mDesiredSize{};
   Dali::ImageDimensions mLastRequiredSize{};
 
