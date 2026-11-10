@@ -16,6 +16,7 @@ SET(TC_SOURCES
     utc-Dali-AnimatedImageView-internal.cpp
     utc-Dali-FocusManager-internal.cpp
     utc-Dali-AsyncImageLoader-internal.cpp
+    utc-Dali-RemoteImageLoading-internal.cpp
     utc-Dali-ImageCache-internal.cpp
     utc-Dali-FastTrackLoadingTask-internal.cpp
     utc-Dali-ImageUrl-internal.cpp
@@ -90,6 +91,7 @@ SET(TC_SOURCES
 # These tests load a Unix shared plugin through the real adaptor engine proxy.
 IF(WIN32)
     LIST(REMOVE_ITEM TC_SOURCES utc-Dali-WidgetView-internal.cpp)
+    LIST(REMOVE_ITEM TC_SOURCES utc-Dali-RemoteImageLoading-internal.cpp)
 ENDIF()
 
 SET(TC_SOURCE_LIST ${TC_SOURCES})
@@ -322,6 +324,11 @@ ADD_LIBRARY(widget-view-test-plugin SHARED test-widget-engine-plugin.cpp)
 TARGET_LINK_LIBRARIES(widget-view-test-plugin ${DALICORE_LDFLAGS} --coverage)
 ADD_DEPENDENCIES(${EXEC_NAME} widget-view-test-plugin)
 INSTALL(TARGETS widget-view-test-plugin DESTINATION ${BIN_DIR})
+
+# Exercises the real download proxy without network requests or a Tizen provider.
+ADD_LIBRARY(remote-image-test-plugin SHARED test-file-download-plugin.cpp)
+TARGET_LINK_LIBRARIES(remote-image-test-plugin ${DALICORE_LDFLAGS} -lpthread --coverage)
+ADD_DEPENDENCIES(${EXEC_NAME} remote-image-test-plugin)
 
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${DALICORE_LIBRARIES}

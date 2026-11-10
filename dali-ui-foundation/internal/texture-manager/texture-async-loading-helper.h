@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/signals/connection-tracker.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/internal/image-loader/loading-task.h>
@@ -105,9 +106,13 @@ private:
    */
   void AsyncLoadComplete(LoadingTaskPtr task);
 
+  void RemoteDecodeComplete(Dali::AsyncTaskPtr task);
+
 private: // Member Variables:
   TextureManager& mTextureManager;
   uint32_t        mLoadTaskId;
+  // Remote completion callbacks use a weak reference to skip a destroyed helper.
+  std::shared_ptr<void> mLifetimeToken{std::make_shared<uint8_t>(0u)};
 };
 
 } // namespace Internal

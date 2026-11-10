@@ -19,10 +19,12 @@
 #include <dali-ui-foundation/internal/texture-manager/texture-async-loading-helper.h>
 
 // EXTERNAL HEADERS
+#include <dali/integration-api/adaptor-framework/file-download/remote-file-download-manager.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADERS
 #include <dali-ui-foundation/internal/image-loader/async-image-loader-impl.h>
+#include <dali-ui-foundation/internal/image-loader/remote-decode-task.h>
 #include <dali-ui-foundation/public-api/image-loader/sync-image-loader.h>
 
 namespace DALI_NAMESPACE
@@ -34,6 +36,11 @@ namespace Internal
 #ifdef DEBUG_ENABLED
 extern Debug::Filter* gTextureManagerLogFilter; ///< Define at texture-manager-impl.cpp
 #endif
+
+namespace
+{
+constexpr size_t MAXIMUM_DOWNLOAD_IMAGE_SIZE = 50 * 1024 * 1024;
+} // namespace
 
 TextureAsyncLoadingHelper::TextureAsyncLoadingHelper(TextureManager& textureManager)
 : mTextureManager(textureManager),
@@ -68,6 +75,38 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId textureId, 
                                   samplingMode, orientationCorrection, preMultiplyOnLoad,
                                   MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   }
+  else if(!url.IsLocalResource() && Dali::RemoteFileDownloadManager::IsAsyncDownloadSupported())
+  {
+    auto asyncTaskManager = Dali::AsyncTaskManager::Get();
+    auto weakLifetime     = std::weak_ptr<void>(mLifetimeToken);
+
+    Dali::RemoteFileDownloadManager::Get().StartDownload(
+      url.GetUrl(), MAXIMUM_DOWNLOAD_IMAGE_SIZE,
+      [this, weakLifetime, asyncTaskManager, textureId, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes](bool success, const std::string& localFilePath) mutable
+    {
+      // The provider callback may run on another thread. Only enqueue decode work here.
+      if(weakLifetime.expired())
+      {
+        return;
+      }
+
+      auto callback = Dali::Callback<void(Dali::AsyncTaskPtr)>::New(
+        [this, weakLifetime](Dali::AsyncTaskPtr task)
+      {
+        // Decode completion and helper destruction both run on the event thread.
+        if(!weakLifetime.expired())
+        {
+          RemoteDecodeComplete(task);
+        }
+      });
+
+      RemoteDecodeTaskPtr decodeTask = new RemoteDecodeTask(
+        textureId, success ? localFilePath : std::string{}, desiredSize, samplingMode,
+        orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, callback.Release());
+      asyncTaskManager.AddTask(decodeTask);
+    });
+    return;
+  }
   else
   {
     loadingTask = new LoadingTask(++mLoadTaskId, url, desiredSize, samplingMode, orientationCorrection,
@@ -97,6 +136,15 @@ void TextureAsyncLoadingHelper::AsyncLoadComplete(LoadingTaskPtr task)
   if(task->textureId != TextureManager::INVALID_TEXTURE_ID)
   {
     mTextureManager.AsyncLoadComplete(task->textureId, task->pixelBuffers);
+  }
+}
+
+void TextureAsyncLoadingHelper::RemoteDecodeComplete(Dali::AsyncTaskPtr task)
+{
+  auto* decodeTask = static_cast<RemoteDecodeTask*>(task.Get());
+  if(decodeTask->textureId != TextureManager::INVALID_TEXTURE_ID)
+  {
+    mTextureManager.AsyncLoadComplete(decodeTask->textureId, decodeTask->pixelBuffers);
   }
 }
 
