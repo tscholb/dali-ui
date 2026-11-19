@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/free-list.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <functional>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
@@ -245,6 +246,8 @@ public:
    */
   TextureCacheManager::TextureCacheIndex AppendCache(const TextureCacheManager::TextureInfo& textureInfo);
 
+  using ObserverRemovalCallback = std::function<void(TextureUploadObserver&)>;
+
   /**
    * @brief Remove a Texture from the TextureCacheManager.
    * @note This API doesn't consider external & encodedimagebuffer.
@@ -254,13 +257,17 @@ public:
    *
    * @param[in] textureInfo TextureInfo that want to cache in container.
    * @param[in] keepUnusedTexture Whether to keep the texture after its reference count becomes zero.
+   * @param[in] unregisterObserver Called for each registration when a cache entry is erased.
    */
-  void RemoveCache(TextureCacheManager::TextureInfo& textureInfo, bool keepUnusedTexture = false);
+  void RemoveCache(TextureCacheManager::TextureInfo& textureInfo,
+                   bool                             keepUnusedTexture,
+                   const ObserverRemovalCallback&   unregisterObserver);
 
   /**
    * @brief Remove all cached textures retained after their reference count became zero.
+   * @param[in] unregisterObserver Called for each registration when a cache entry is erased.
    */
-  void ClearUnusedCache();
+  void ClearUnusedCache(const ObserverRemovalCallback& unregisterObserver);
 
 public:
   /**
@@ -329,8 +336,9 @@ private:
    * @brief Remove an unreferenced TextureInfo without changing its reference count.
    *
    * @param[in] textureInfo TextureInfo to remove.
+   * @param[in] unregisterObserver Called for each registration when the entry is erased.
    */
-  void RemoveUnusedCache(TextureCacheManager::TextureInfo& textureInfo);
+  void RemoveUnusedCache(TextureCacheManager::TextureInfo& textureInfo, const ObserverRemovalCallback& unregisterObserver);
 
   /**
    * @brief Used to lookup an index into the ExternalTextureInfoContainer from a textureId

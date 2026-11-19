@@ -28,6 +28,7 @@
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <algorithm>
+#include <utility>
 
 // INTERNAL HEADERS
 #include <dali-ui-foundation/internal/texture-manager/texture-async-loading-helper.h>
@@ -541,7 +542,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
         {
           iterator = textureInfo.observerList.Erase(iterator);
           DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n", observer);
-          observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
+          UnregisterObserver(*observer);
         }
         else
         {
@@ -754,8 +755,13 @@ void TextureManager::Remove(const TextureManager::TextureId textureId, bool keep
                     textureId, textureCacheIndex.GetIndex(), maskTextureId,
                     GET_LOAD_STATE_STRING(textureInfo.loadState));
 
+      const TextureCacheManager::ObserverRemovalCallback unregisterObserver = [this](TextureUploadObserver& observer)
+      {
+        UnregisterObserver(observer);
+      };
+
       // Remove textureId in CacheManager. Now, textureInfo is invalidate.
-      mTextureCacheManager.RemoveCache(textureInfo, keepUnusedTexture);
+      mTextureCacheManager.RemoveCache(textureInfo, keepUnusedTexture, unregisterObserver);
 
       // Remove maskTextureId in CacheManager
       if(maskTextureId != INVALID_TEXTURE_ID)
@@ -769,7 +775,7 @@ void TextureManager::Remove(const TextureManager::TextureId textureId, bool keep
                         "TextureManager::Remove mask texture( maskTextureId=%d ) cacheIndex:%d, loadState=%s\n",
                         maskTextureId, maskCacheIndex.GetIndex(), GET_LOAD_STATE_STRING(maskTextureInfo.loadState));
 
-          mTextureCacheManager.RemoveCache(maskTextureInfo, keepUnusedTexture);
+          mTextureCacheManager.RemoveCache(maskTextureInfo, keepUnusedTexture, unregisterObserver);
         }
       }
     }
@@ -810,7 +816,10 @@ void TextureManager::ProcessRemoveQueue()
   if(mClearUnusedTexturesRequested)
   {
     mClearUnusedTexturesRequested = false;
-    mTextureCacheManager.ClearUnusedCache();
+    mTextureCacheManager.ClearUnusedCache([this](TextureUploadObserver& observer)
+    {
+      UnregisterObserver(observer);
+    });
   }
 
   DALI_TRACE_END(gTraceFilter, "DALI_TEXTURE_MANAGER_PROCESS_REMOVE_QUEUE");
@@ -928,8 +937,7 @@ void TextureManager::QueueLoadTexture(const TextureManager::TextureInfo& texture
 
   if(observer)
   {
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Connect DestructionSignal to observer:%p\n", observer);
-    observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
+    RegisterObserver(*observer);
   }
 }
 
@@ -970,41 +978,50 @@ void TextureManager::ProcessLoadQueue()
       continue;
     }
 
-    TextureCacheIndex cacheIndex = mTextureCacheManager.GetCacheIndexFromId(element.mTextureId);
-    if(cacheIndex != INVALID_CACHE_INDEX)
+    auto*                   observer   = std::exchange(element.mObserver, nullptr);
+    const TextureCacheIndex cacheIndex = mTextureCacheManager.GetCacheIndexFromId(element.mTextureId);
+    if(cacheIndex == INVALID_CACHE_INDEX)
     {
-      TextureInfo& textureInfo(mTextureCacheManager[cacheIndex]);
-
-      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General,
-                    "TextureManager::ProcessLoadQueue() textureId=%d, observer=%p, cacheIndex=@%d, loadState:%s\n",
-                    element.mTextureId, element.mObserver, cacheIndex.GetIndex(),
-                    GET_LOAD_STATE_STRING(textureInfo.loadState));
-
-      if((textureInfo.loadState == TextureManager::LoadState::UPLOADED) ||
-         (textureInfo.loadState == TextureManager::LoadState::LOAD_FAILED) ||
-         (textureInfo.loadState == TextureManager::LoadState::LOAD_FINISHED &&
-          textureInfo.storageType == TextureManager::StorageType::RETURN_PIXEL_BUFFER))
+      if(observer)
       {
-        if(element.mObserver)
-        {
-          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n",
-                        element.mObserver);
-          element.mObserver->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
+        UnregisterObserver(*observer);
+      }
+      continue;
+    }
 
-          EmitLoadComplete(element.mObserver, textureInfo,
-                           (textureInfo.loadState != TextureManager::LoadState::LOAD_FAILED));
-        }
-      }
-      else if(textureInfo.loadState == TextureManager::LoadState::LOADING)
+    TextureInfo& textureInfo(mTextureCacheManager[cacheIndex]);
+
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General,
+                  "TextureManager::ProcessLoadQueue() textureId=%d, observer=%p, cacheIndex=@%d, loadState:%s\n",
+                  element.mTextureId, observer, cacheIndex.GetIndex(),
+                  GET_LOAD_STATE_STRING(textureInfo.loadState));
+
+    if((textureInfo.loadState == TextureManager::LoadState::UPLOADED) ||
+       (textureInfo.loadState == TextureManager::LoadState::LOAD_FAILED) ||
+       (textureInfo.loadState == TextureManager::LoadState::LOAD_FINISHED &&
+        textureInfo.storageType == TextureManager::StorageType::RETURN_PIXEL_BUFFER))
+    {
+      if(observer)
       {
-        // Note : LOADING state texture cannot be queue.
-        // This case be occured when same texture id are queue in mLoadQueue.
-        ObserveTexture(textureInfo, element.mObserver);
+        UnregisterObserver(*observer);
+        EmitLoadComplete(observer, textureInfo, textureInfo.loadState != TextureManager::LoadState::LOAD_FAILED);
       }
-      else
-      {
-        LoadTexture(textureInfo, element.mObserver);
-      }
+      continue;
+    }
+
+    if(textureInfo.loadState == TextureManager::LoadState::LOADING)
+    {
+      // An earlier queue entry has already started loading this texture.
+      ObserveTexture(textureInfo, observer);
+    }
+    else
+    {
+      LoadTexture(textureInfo, observer);
+    }
+    if(observer)
+    {
+      // The observer list now owns the registration. Release the queue's count.
+      UnregisterObserver(*observer);
     }
   }
 
@@ -1022,8 +1039,7 @@ void TextureManager::ObserveTexture(TextureManager::TextureInfo& textureInfo, Te
   {
     textureInfo.observerList.PushBack(observer);
 
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Connect DestructionSignal to observer:%p\n", observer);
-    observer->DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
+    RegisterObserver(*observer);
   }
 }
 
@@ -1405,12 +1421,9 @@ void TextureManager::NotifyObservers(TextureManager::TextureInfo& textureInfo, c
                   observer, textureId, info->desiredSize.GetWidth(), info->desiredSize.GetHeight(),
                   info->url.GetUrl().c_str(), GET_LOAD_STATE_STRING(info->loadState), info->preMultiplied);
     // It is possible for the observer to be deleted.
-    // Disconnect and remove the observer first.
-    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n",
-                  observer);
-    observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
-
+    // Remove the registration before invoking the completion callback.
     info->observerList.Erase(info->observerList.End() - 1u);
+    UnregisterObserver(*observer);
 
     EmitLoadComplete(observer, *info, success);
 
@@ -1436,6 +1449,8 @@ void TextureManager::ObserverDestroyed(TextureUploadObserver* observer)
 {
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "TextureManager::ObserverDestroyed() observer:%p\n",
                 observer);
+
+  mObserverRegistrationCounts.erase(observer);
 
   const std::size_t size = mTextureCacheManager.size();
   for(TextureCacheIndex cacheIndex = TextureCacheIndex(TextureManagerType::TEXTURE_CACHE_INDEX_TYPE_LOCAL, 0u);
@@ -1534,11 +1549,8 @@ void TextureManager::RemoveTextureObserver(TextureManager::TextureInfo& textureI
     const auto iter    = std::find(textureInfo.observerList.Begin(), iterEnd, observer);
     if(iter != iterEnd)
     {
-      // Disconnect and remove the observer.
-      DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n",
-                    observer);
-      observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
       textureInfo.observerList.Erase(iter);
+      UnregisterObserver(*observer);
     }
     else
     {
@@ -1551,14 +1563,33 @@ void TextureManager::RemoveTextureObserver(TextureManager::TextureInfo& textureI
           DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose,
                         "Remove observer from observer queue (textureId:%d, observer:%p)\n", element.mTextureId,
                         element.mObserver);
-          DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n",
-                        observer);
-          observer->DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
           element.mObserver = nullptr;
+          UnregisterObserver(*observer);
           break;
         }
       }
     }
+  }
+}
+
+void TextureManager::RegisterObserver(TextureUploadObserver& observer)
+{
+  if(++mObserverRegistrationCounts[&observer] == 1u)
+  {
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Connect DestructionSignal to observer:%p\n", &observer);
+    observer.DestructionSignal().Connect(this, &TextureManager::ObserverDestroyed);
+  }
+}
+
+void TextureManager::UnregisterObserver(TextureUploadObserver& observer)
+{
+  const auto registration = mObserverRegistrationCounts.find(&observer);
+  DALI_ASSERT_DEBUG(registration != mObserverRegistrationCounts.end());
+  if(registration != mObserverRegistrationCounts.end() && --registration->second == 0u)
+  {
+    mObserverRegistrationCounts.erase(registration);
+    DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Verbose, "  Disconnect DestructionSignal to observer:%p\n", &observer);
+    observer.DestructionSignal().Disconnect(this, &TextureManager::ObserverDestroyed);
   }
 }
 

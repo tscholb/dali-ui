@@ -7,6 +7,7 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 # include this file in source-list-only mode without configuring Unix targets.
 SET(TC_SOURCES
     utc-Dali-TextureManager-internal.cpp
+    utc-Dali-TextureObserverLifetime-internal.cpp
     utc-Dali-TextRenderScaleFallback-internal.cpp
     utc-Dali-AsyncTextLoaderOwnership-internal.cpp
     utc-Dali-BidirectionalSupport-internal.cpp
