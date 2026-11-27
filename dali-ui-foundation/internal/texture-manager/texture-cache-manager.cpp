@@ -695,7 +695,9 @@ TextureCacheManager::TextureCacheIndex TextureCacheManager::AppendCache(
   return cacheIndex;
 }
 
-void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureInfo, bool keepUnusedTexture)
+void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureInfo,
+                                      bool                              keepUnusedTexture,
+                                      const ObserverRemovalCallback&    unregisterObserver)
 {
   DALI_LOG_INFO(gTextureManagerLogFilter, Debug::Concise,
                 "TextureCacheManager::Remove(textureId:%d) url:%s\n  cacheIdx:%d loadState:%s reference count = %d\n",
@@ -711,12 +713,12 @@ void TextureCacheManager::RemoveCache(TextureCacheManager::TextureInfo& textureI
 
     if(!textureInfo.keepUnusedTexture)
     {
-      RemoveUnusedCache(textureInfo);
+      RemoveUnusedCache(textureInfo, unregisterObserver);
     }
   }
 }
 
-void TextureCacheManager::ClearUnusedCache()
+void TextureCacheManager::ClearUnusedCache(const ObserverRemovalCallback& unregisterObserver)
 {
   for(std::size_t index = 0u; index < mTextureInfoContainer.size();)
   {
@@ -725,7 +727,7 @@ void TextureCacheManager::ClearUnusedCache()
     {
       const auto cacheSize          = mTextureInfoContainer.size();
       textureInfo.keepUnusedTexture = false;
-      RemoveUnusedCache(textureInfo);
+      RemoveUnusedCache(textureInfo, unregisterObserver);
 
       // RemoveUnusedCache swaps the last element into this index when it erases an entry.
       if(cacheSize != mTextureInfoContainer.size())
@@ -737,7 +739,7 @@ void TextureCacheManager::ClearUnusedCache()
   }
 }
 
-void TextureCacheManager::RemoveUnusedCache(TextureCacheManager::TextureInfo& textureInfo)
+void TextureCacheManager::RemoveUnusedCache(TextureCacheManager::TextureInfo& textureInfo, const ObserverRemovalCallback& unregisterObserver)
 {
   TextureCacheIndex textureInfoIndex  = GetCacheIndexFromId(textureInfo.textureId);
   bool              removeTextureInfo = false;
@@ -768,6 +770,11 @@ void TextureCacheManager::RemoveUnusedCache(TextureCacheManager::TextureInfo& te
   // If the state allows us to remove the TextureInfo data, we do so.
   if(removeTextureInfo)
   {
+    for(auto* observer : textureInfo.observerList)
+    {
+      unregisterObserver(observer);
+    }
+
     // If url location is BUFFER, decrease reference count of EncodedImageBuffer.
     if(textureInfo.url.IsBufferResource())
     {

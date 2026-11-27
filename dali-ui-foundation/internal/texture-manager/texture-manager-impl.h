@@ -24,7 +24,9 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
+#include <cstddef>
 #include <memory>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali-ui-foundation/internal/texture-manager/texture-cache-manager.h>
@@ -570,6 +572,22 @@ private:
    */
   void RemoveTextureObserver(TextureManager::TextureInfo& textureInfo, TextureUploadObserver* observer);
 
+  /**
+   * @brief Add a registration of the observer in the load queue or a texture observer list.
+   * Connect the destruction signal when the observer is registered for the first time.
+   *
+   * @param[in] observer The observer to register. Must not be null.
+   */
+  void RegisterObserver(TextureUploadObserver* observer);
+
+  /**
+   * @brief Remove a registration of the observer from the load queue or a texture observer list.
+   * Disconnect the destruction signal after the last registration is removed.
+   *
+   * @param[in] observer The observer to unregister. Must not be null.
+   */
+  void UnregisterObserver(TextureUploadObserver* observer);
+
 private: // Internal methods
   /**
    * @brief Returns the textureSet in texture manager.
@@ -658,6 +676,8 @@ private: // Member Variables:
   const bool mLoadYuvPlanes;                ///< A global flag to specify if the image should be loaded as yuv planes
   bool       mRemoveProcessorRegistered;    ///< Flag if remove processor registered or not.
   bool       mClearUnusedTexturesRequested; ///< Flag if unused retained textures should be cleared at PostProcess.
+
+  std::unordered_map<TextureUploadObserver*, std::size_t> mObserverRegistrationCounts; ///< Number of registrations per observer in the load queue and texture observer lists.
 };
 
 } // namespace Internal
